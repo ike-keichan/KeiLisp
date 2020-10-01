@@ -2,9 +2,11 @@
 
 "use strict";
 
+//モジュール「Cons」を読み込む。
 import { Cons } from './Cons.js';
+
 //モジュール「Evaluator」を読み込む。
-import {Evaluator} from './Evaluator.js';
+import { Evaluator } from './Evaluator.js';
 
 /**
  * @class
@@ -23,22 +25,12 @@ export class Parser
      */
     constructor(input)
     {
-        this.aString = input.replace(/(\(|\)|\'|\,)/g, ' $1 ').split(/\s+/).filter(x => x != '');
-        
-        
-
+        this.anArray = input.replace(/(\(|\)|\'|\.)/g, ' $1 ').split(/\s+/g).filter(x => x != '');
+        console.log(this.anArray); //デバック用
+    
         this.index = 0;
-        console.log(this.aString); //デバック用
-        console.log(this.aCons); //デバック用
 
         return null;
-    }
-
-    makeTree()
-    {
-
-
-        return;
     }
 
     /**
@@ -47,15 +39,13 @@ export class Parser
      */
     parse()
     {
-        console.log(this.aString); //デバック用
-
         while(this.index < this.anArray.length)
         {
             try
             {
-                // let anEvaluator = new Evaluator();
-                // console.log(this.parseToken()); //デバック用
-                // console.log(anEvaluator.eval(this.parseToken()));
+                let anEvaluator = new Evaluator();
+                console.log(this.parseToken()); //デバック用
+                console.log(anEvaluator.eval(this.parseToken()));
             } catch (e){ console.log('SyntaxError!!'); break; }
         }
 
@@ -144,11 +134,9 @@ export class Parser
         while(flag)
         {
             let anotherToken = this.anArray[this.index];
-            if(this.numberOfRightParenthesis <= 1) 
-            {
+            
                 if(anotherToken.match(/[)]$/g))
                 {
-                    this.numberOfRightParenthesis = ( anotherToken.match(/[)]/g) || 0 ).length ;
                     this.anArray.splice(this.index, 1, anotherToken.replace(/[)]+$/, ''));
                     anotherArray.push(this.parseToken());
                     flag = false;
@@ -157,12 +145,6 @@ export class Parser
                 {
                     anotherArray.push(this.parseToken());
                 }
-            }
-            else
-            { 
-                this.numberOfRightParenthesis--;
-                flag = false;
-            }
         }
 
         return anotherArray.filter(value => value !== '');

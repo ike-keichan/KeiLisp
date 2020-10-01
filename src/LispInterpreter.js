@@ -3,7 +3,7 @@
 "use strict";
 
 //モジュール「Parser」を読み込む。
-import {Parser} from './Parser.js';
+import { Parser } from './Parser.js';
 
 /**
  * @class

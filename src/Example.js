@@ -3,7 +3,7 @@
 "use strict";
 
 //モジュール「LispInterpreter」を読み込む。
-import {LispInterpreter} from './LispInterpreter.js';
+import { LispInterpreter } from './LispInterpreter.js';
 
 /**
  * インタプリタを起動するサンプル関数。
