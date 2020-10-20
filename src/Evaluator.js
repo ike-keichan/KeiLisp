@@ -2,6 +2,9 @@
 
 "use strict";
 
+//モジュール「Cons」を読み込む。
+import { Cons } from './Cons.js';
+
 /**
  * @class
  * @classdesc イーバル（評価）を行うクラス
@@ -16,80 +19,14 @@ export class Evaluator
      * @constructor
      * @return {Null} 何も返さない。
      */
-    // constructor()
-    // {
-    //     /**
-    //      * 関数の連想リスト
-    //      * @type {Object}
-    //      */
-    //     this.functionList = {
-    //         '<':  (args) => (args[0] < args[1] ? 't' : 'nil'),
-    //         '<=': (args) => (args[0] <= args[1] ? 't' : 'nil'),
-    //         '>':  (args) => (args[0] > args[1] ? 't' : 'nil'),
-    //         '>=': (args) => (args[0] >= args[1] ? 't' : 'nil'),
-    //         '=':  (args) => (args[0] == args[1] ? 't' : 'nil'),
-    //         '==': (args) => (args[0] === args[1] ? 't' : 'nil'),
-    //         'append': (args) => (),
-    //         'atom': (args) => (),
-    //         'car': (args) => (),
-    //         'cdr': (args) => (),
-    //         'clear': (args) => (),
-    //         'cons': (args) => (),
-    //         'consp': (args) => (),
-    //         'dtpr': (args) => (),
-    //         'doublep': (args) => (),
-    //         'eq': (args) => (),
-    //         'equal': (args) => (),
-    //         'eval': (args) => (),
-    //         'expr': (args) => (),
-    //         'fexprs': (args) => (),
-    //         'floatp': (args) => (),
-    //         'fsubrs': (args) => (),
-    //         'gc': ,
-    //         'gensym': ,
-    //         'getprop': ,
-    //         'integerp': ,
-    //         'last': ,
-    //         'length': ,
-    //         'lisp': ,
-    //         'member': ,
-    //         'memq': ,
-    //         'nconc': ,
-    //         'neq': ,
-    //         'nequal': ,
-    //         'nospy': ,
-    //         'not': ,
-    //         'notrace': ,
-    //         'nth': ,
-    //         'null': ,
-    //         'numberp': ,
-    //         'oblist': ,
-    //         'pp': ,
-    //         'princ': ,
-    //         'print': ,
-    //         'putprop': ,
-    //         'remprop': ,
-    //         'reverse': ,
-    //         'rplaca': ,
-    //         'rplacd': ,
-    //         'spy': ,
-    //         'stringp': ,
-    //         'subrs': ,
-    //         'symbokp': ,
-    //         'terpri': ,
-    //         'trace': ,
-    //         '~=': ,
-    //         '~~': ,
-    //         '*':  (args) => (args[0] * args[1]),
-    //         '+':  (args) => (args[0] + args[1]),
-    //         '-':  (args) => (args[0] - args[1]),
-    //         '/':  (args) => (args[0] / args[1]),
-    //         '//':  (args) => (args[0] / args[1]),
-    //         '.':  (args) => console.log(args[0]),
-    //     };
+    constructor()
+    {
+        this.functionList = {
+            '+':  (args) => (args.car + args.cdr.car),
+        }
 
-    //     return null;
-    // }
+        return null;
+    }
     
     /**
      * イーバリュエータ(評価器)の起動
@@ -98,16 +35,18 @@ export class Evaluator
      */
     eval(input)
     {
-        if(Array.isArray(input)){
-            let fn = this.functionList[input[0]];
-            let args = input.slice(1);
-            return fn(args.map(arg => this.eval(arg)));
-        } else if(typeof(input) == 'number'){
-            return input;
+        if(Cons.isCons(input)){
+            console.log(input.car);
+            console.log(input.cdr);
+            let fn = this.functionList[input.car];
+            let args = input.cdr
+            return fn(args => this.eval(args));
+        } else if(typeof(input.car) == 'number'){
+            return input.car;
         } else if (typeof(input) == 'string'){
-            return input;
+            return input.car;
         }
 
-        return input;
+        return input.car;
     }
 }

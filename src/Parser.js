@@ -25,10 +25,10 @@ export class Parser
      */
     constructor(input)
     {
+        this.aCons = new Cons();
         this.anArray = input.replace(/(\(|\)|\'|\.)/g, ' $1 ').split(/\s+/g).filter(x => x != '');
-        console.log(this.anArray); //デバック用
-    
         this.index = 0;
+        // console.log(this.anArray); //デバック用
 
         return null;
     }
@@ -41,15 +41,49 @@ export class Parser
     {
         while(this.index < this.anArray.length)
         {
-            try
-            {
+            // try
+            // {
                 let anEvaluator = new Evaluator();
-                console.log(this.parseToken()); //デバック用
-                console.log(anEvaluator.eval(this.parseToken()));
-            } catch (e){ console.log('SyntaxError!!'); break; }
+                let parsedArray = this.parseToken();
+                // console.log(parsedArray);
+                this.aCons = new Cons(this.prepareCons(parsedArray[0]), this.prepareCons(parsedArray.slice(1)));
+                this.debugCons();
+                // console.log(anEvaluator.eval(this.aCons));
+            // } catch (e){ console.log('SyntaxError!!'); break; }
         }
 
         return null;
+    }
+
+    debugCons()
+    {
+        console.log(this.aCons.toString());
+        // console.log(this.aCons.add(1).toString());
+
+
+        return null;
+    }
+
+    /**
+     * Consを用意するメソッド
+     * @param {*} anObject 引数のオブジェクト
+     * @return {Cons} 用意したCons
+     */
+    prepareCons(anObject)
+    {
+        let inclusiveCons = new Cons();
+
+        if(!Array.isArray(anObject)){ //anObjectがリストでない場合
+            inclusiveCons = anObject;
+        }
+        else if(Array.isArray(anObject) && anObject.length == 1){ //anObjectがリストで、かつ要素が1つの場合
+            inclusiveCons = new Cons(this.prepareCons(anObject[0]));
+        }
+        else{ //anObjectがリストで、かつ要素が2つ以上の場合
+            inclusiveCons = new Cons(this.prepareCons(anObject[0]), this.prepareCons(anObject.slice(1)));
+        }
+
+        return inclusiveCons;
     }
 
     /**
@@ -64,20 +98,24 @@ export class Parser
         if(token == null)
         {
             return 'nil';
-        } 
+        }
+        // else if(token.match(/^[\']/g))
+        // {
+        //     return
+        // }
         else if(token.match(/^[(]/g))
         {
             return this.parseList(token);
-        } 
+        }
         else if(token.match(/^[0-9]+$/g))
         {
             return this.parseNumber(token);
-        } 
+        }
         else if(typeof(token) === 'string')
         {
             return this.parseString(token);
-        } 
-        else 
+        }
+        else
         {
             return this.parseSymbol(token);
         }
@@ -87,7 +125,7 @@ export class Parser
      * アトムが数字となるトークンを構文解析するメソッド
      * @param {*} token 数字トークン
      * @return {Number} 構文解析を終えた数字トークン
-     * 
+     *
      */
     parseNumber(token)
     {
@@ -124,9 +162,6 @@ export class Parser
      */
     parseList(token)
     {
-        // let nextToken = this.anArray[this.index+1];
-        // if(token.match(/^[(]/g) && nextToken.match(/^[)]/g)){ return 'nil' }
-
         this.anArray.splice(this.index, 1, token.replace(/^[(]/, ''));
         let anotherArray = [this.parseToken()];
         let flag = true;
@@ -134,14 +169,14 @@ export class Parser
         while(flag)
         {
             let anotherToken = this.anArray[this.index];
-            
+
                 if(anotherToken.match(/[)]$/g))
                 {
                     this.anArray.splice(this.index, 1, anotherToken.replace(/[)]+$/, ''));
                     anotherArray.push(this.parseToken());
                     flag = false;
                 }
-                else 
+                else
                 {
                     anotherArray.push(this.parseToken());
                 }

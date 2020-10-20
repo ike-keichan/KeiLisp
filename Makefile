@@ -34,7 +34,7 @@ wipe: clean
 	@xattr -cr ./
 	@(cd ../ ; if [ -e $(ARCHIVE).zip ] ; then echo "rm -f ../$(ARCHIVE).zip" ; rm -f $(ARCHIVE).zip ; fi)
 	@(cd ../ ; if [ -e $(ARCHIVE).tar.gz ] ; then echo "rm -f ../$(ARCHIVE).tar.gz" ; rm -f $(ARCHIVE).tar.gz ; fi)
-	@(cd ./ ; if [ -e $(DOC_DIRECTORY) ] ; then echo "rm -rf ./$(DOC_DIRECTORY)" ; rm -rf $(DOC_DIRECTORY) ; fi)
+	@if [ -e $(DOC_DIRECTORY) ] ; then echo "rm -rf ./$(DOC_DIRECTORY)" ; rm -rf $(DOC_DIRECTORY) ; fi
 
 test: all
 	$(JS_ENGINE) $(TARGET_SCRIPT)
