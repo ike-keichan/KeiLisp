@@ -2,11 +2,14 @@
 
 "use strict";
 
+//モジュール「Parser」を読み込む。
+import { Parser } from './Parser';
+
 //モジュール「Loop」を読み込む。
 import { Loop } from './Loop';
 
-//モジュール「Parser」を読み込む。
-import { Parser } from './Parser';
+//モジュール「Table」を読み込む。
+import { Table } from './Table';
 
 /**
  * @class
@@ -33,7 +36,7 @@ export class Cons extends Object
     }
 
     /**
-     * Consの最後に指定された要素を加える
+     * Consの最後に指定された要素を加えるメソッド
      * @param {*} anObject 加えるオブジェクト
      * @return {Cons} 要素を加えたCons
      */
@@ -43,29 +46,57 @@ export class Cons extends Object
         return this.nconc(aCons);
     }
 
+    /**
+     * 自身（Cons）を複製し、応答するメソッド
+     * @return {Cons} 複製したCons
+     */
     clone()
     {
-
+        return new Cons(Cons.cloneValue(this.car), Cons.cloneValue(this.cdr));
     }
 
-    static cloneValue()
+    /**
+     * 引数の値(Consの要素)を複製し、応答するメソッド
+     * @param {*} value Consの要素
+     * @return {*} value 複製したConsの要素
+     */
+    static cloneValue(value)
     {
-
+        if(Cons.isCons(value))  { return value.clone(); }
+        if(Cons.isNil(value))   { return 'nil' }
+        if(Cons.isNumber(value)){ return Number(value); }
+        if(Cons.isString(value)){ return String(value); }
+        if(Cons.isSymbol(value)){ return value; }
+        if(Cons.isTable(value)) { return value; }
+        return value;
     }
 
-    equals()
+    /**
+     * 自身と引数が等しいかをどうかを判別し、応答するメソッド
+     * @param {*} anObject 判別するオブジェクト
+     * @return {Boolean} 真偽値
+     */
+    equals(anObject)
     {
-
+        if(Cons.isCons(anObject)){ return this.equalsAUX(this, anObject); }
+        return false;
     }
 
-    equalsAUX()
+    /**
+     * 2つ引数がともにConsであり、等しいかをどうかを判別し、応答するメソッド
+     * @param {*} left 判別するオブジェクト
+     * @param {*} right 判別するオブジェクト
+     * @return {Boolean} 真偽値
+     */
+    equalsAUX(left, right)
     {
+        if(left == right){ return true; }
+        if((Cons.isCons(left) && Cons.isCons(right)) == false){ return false; }
+        let leftCons = left;
+        let rightCons = right;
+        if(this.equalsAUX(leftCons.car, rightCons.car)){ return this.equalsAUX(leftCons.cdr, rightCons.cdr); }
 
-    }
-
-    hashCode()
-    {
-
+        return false;
     }
 
     /**
@@ -75,7 +106,7 @@ export class Cons extends Object
      */
     static isAtom(anObject)
     {
-        return !( Cons.isNil(anObject) || Cons.isCons(anObject) );
+        return !(Cons.isList(anObject));
     }
 
     /**
@@ -137,7 +168,7 @@ export class Cons extends Object
     {
         return (anObject instanceof Number || (typeof anObject) == "number");
     }
-    
+
     /**
      * 引数が文字列かどうかを判別し、応答するメソッド
      * @param {*} anObject 判別するオブジェクト
@@ -155,12 +186,17 @@ export class Cons extends Object
      */
     static isSymbol(anObject)
     {
-        return (anObject instanceof Symbol);
+        return anObject instanceof Symbol;
     }
 
-    static isTable()
+    /**
+     * 引数が環境かどうかを判別し、応答するメソッド
+     * @param {*} anObject 判別するオブジェクト
+     * @return {Boolean} 真偽値
+     */
+    static isTable(anObject)
     {
-
+        return anObject instanceof Table;
     }
 
     /**
@@ -171,7 +207,7 @@ export class Cons extends Object
     {
         let aCons = new Cons('nil', this);
         let anotherCons = this;
-        
+
         while(Cons.isCons(anotherCons))
         {
             if( (Cons.isCons(anotherCons.cdr)) == false ){ break; }
@@ -216,14 +252,14 @@ export class Cons extends Object
      */
     nconc(aCons)
     {
-        this.last().setCdr(aCons);
+        this.last().cdr(aCons);
         return this;
     }
 
     /**
 	 * Consのn番目の要素を応答するメソッド
-	 * @param number
-	 * @return anObject
+	 * @param aNumber 指定する番号
+	 * @return anObject 指定した番号の要素
 	 */
     nth(aNumber)
     {
@@ -241,35 +277,17 @@ export class Cons extends Object
 
     /**
      * 指定された文字列を字句解析してConsを生成し、応答するメソッド
-     * @param {String} aString 
+     * @param {String} aString 字句解析する文字列
+     * @return {}
      */
     static parse(aString)
     {
-        return Parser.parse(aString);
-    }
-
-    ppList()
-    {
-
-    }
-
-    ppListTail()
-    {
-
-    }
-
-    ppSpace()
-    {
-
-    }
-
-    ppString()
-    {
-
+        let aParser = new Parser(aString);
+        return aParser.parse();
     }
 
     /**
-     * carを設定するセッターメソッド
+     * carを設定するメソッド
      * @param {*} anObject car
      * @return {Null} 何も返さない。
      */
@@ -280,7 +298,7 @@ export class Cons extends Object
     }
 
     /**
-     * cdrを設定するセッターメソッド
+     * cdrを設定するメソッド
      * @param {*} anObject cdr
      * @return {Null} 何も返さない。
      */
@@ -291,7 +309,7 @@ export class Cons extends Object
     }
 
    /**
-     * Consを設定するセッターメソッド
+     * Consを設定するメソッド
      * @param {*} car car
      * @param {*} cdr cdr
      * @return {Cons} 自身

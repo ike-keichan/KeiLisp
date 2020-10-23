@@ -17,8 +17,7 @@ import { Evaluator } from './Evaluator.js';
 export class Parser
 {
     /**
-     * コンストラクタメソッド
-     * 標準入力の引数を配列にする。
+     * コンストラクタメソッド、標準入力の引数を配列にする。
      * @constructor
      * @param {*} input 標準入力の引数
      * @return {Null} 何も返さない。
@@ -47,20 +46,35 @@ export class Parser
                 let parsedArray = this.parseToken();
                 // console.log(parsedArray);
                 this.aCons = new Cons(this.prepareCons(parsedArray[0]), this.prepareCons(parsedArray.slice(1)));
-                this.debugCons();
+                // this.debugCons();
                 // console.log(anEvaluator.eval(this.aCons));
             // } catch (e){ console.log('SyntaxError!!'); break; }
         }
 
-        return null;
+        return this.aCons;
     }
 
     debugCons()
     {
         console.log(this.aCons.toString());
-        // console.log(this.aCons.add(1).toString());
+        
+        let bCons = this.aCons.clone();
+        
+        console.log(bCons.toString());
 
+        for(const value of this.aCons.loop())
+        {
+            console.log(value);
+        }
 
+        (async() =>
+        {
+            for await(const value of this.aCons.loop())
+            {
+                console.log(value);
+            }
+        })();
+        
         return null;
     }
 

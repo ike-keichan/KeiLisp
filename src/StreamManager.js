@@ -13,18 +13,12 @@ import { Cons } from './Cons.js';
  */
 export class Table extends Object
 {
-    /**
-     * コンストラクタメソッド
-     * @constructor 
-     * @param 
-     * @return 
-     */
     constructor()
     {
         super();
         this.isTrace = false;
-        this.streamTable = new Object();
-        this.spyTable = new Object();
+        this.streamTable = new Map();
+        this.spyTable = new Map();
         this.traceStream = null;
         this.initialize();
 
@@ -44,23 +38,38 @@ export class Table extends Object
     isSpy(aSymbol)
     {
         if(this.isTrace){ return true; }
-        if(aSymbol in this.spyTable){ return true; }
+        if(this.spyTable.has(aSymbol)){ return true; }
         return false;
-    }
-
-    setIsTrace()
-    {
-
     }
 
     noSpy(aSymbol)
     {
-        
+        if(this.spyTable.has(aSymbol))
+        {
+            // Todo:並列処理？
+        }
+
+        return null;
     }
 
     noTrace()
     {
+        this.setIsTrace(false);
+        // Todo:並列処理？
 
+        return null;
+    }
+
+    setIsTrace(aBoolean)
+    {
+        this.isTrace = aBoolean;
+        return null;
+    }
+
+    setTraceStream(aStream)
+    {
+        this.traceStream = aStream;
+        return null;
     }
 
     spy()
@@ -79,13 +88,9 @@ export class Table extends Object
     }
 
 
-    trace()
+    trace(aString)
     {
-
+        
     }
 
-    traceStream()
-    {
-
-    }
 }

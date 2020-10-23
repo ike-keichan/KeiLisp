@@ -12,15 +12,18 @@ export class Loop extends Object
 {
     /**
      * コンストラクタメソッド
-     * @constructor Consのイテレータを作るコンストラクタ
+     * @constructor
      * @param {Cons} aCons Cons
      * @return {Loop} 自身
      */
     constructor(aCons)
     {
         super();
+        // イテレートするCons
         this.aCons = aCons;
+        // イテレートするConsの長さ
         this.length = aCons.length();
+        // インデックス番号
         this.index = 1;
 
         return this;
@@ -48,11 +51,51 @@ export class Loop extends Object
      * 次の要素を応答するメソッド
      * @return {Object} 自身
      */
-    next()
+    next() 
     {
-        // let anObject = this.aCons.nth(this.index);
-        // this.remove();
-        // return anObject;
+        // Todo:並列処理？
+    }
+
+    /**
+     * 反復可能プロトコルiteratorの実装
+     * for...ofなどでのイテレートが可能になる。
+     */
+    [Symbol.iterator](){
+        return {
+            next:  () => {
+                if(this.index <= this.length)
+                {
+                    let nextValue = this.aCons.nth(this.index);
+                    this.remove();
+                    return { value : nextValue, done : false };
+                } 
+                else 
+                {
+                    return { done : true };
+                }
+            }
+        }
+    }
+    
+    /**
+     * 非同期反復可能プロトコルasyncIteratorの実装
+     * for...ofなどでのイテレートが可能になる。
+     */
+    [Symbol.asyncIterator](){
+        return {
+            next:  () => {
+                if(this.index <= this.length)
+                {
+                    let nextValue = this.aCons.nth(this.index);
+                    this.remove();
+                    return Promise.resolve({ value : nextValue, done : false });
+                } 
+                else 
+                {
+                    return Promise.resolve({ done : true });
+                }
+            }
+        }
     }
 
     /**
