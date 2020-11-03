@@ -22,6 +22,7 @@ $(TARGET_SCRIPT): $(SCRIPTS)
 	npx webpack --progress --display-modules #--verbose
 
 prepare:
+	@sh ./PrepareESLint.sh
 	@sh ./PrepareJSDoc.sh
 
 clean:

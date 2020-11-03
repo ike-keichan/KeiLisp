@@ -30,7 +30,7 @@ export class Loop extends Object
     }
 
     /**
-     * 次の要素へ移行するメソッド
+     * 自身を応答するメソッド
      * @return {Loop} 自身
      */
     iterator()
@@ -51,9 +51,20 @@ export class Loop extends Object
      * 次の要素を応答するメソッド
      * @return {Object} 自身
      */
-    next() 
+    async next() 
     {
-        // Todo:並列処理？
+        let anObject = await (() =>
+        {
+            let anotherObject = this.aCons.nth(this.index);
+            this.remove();
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(anotherObject);
+                }, 2000);
+            })
+        })();
+
+        return anObject;
     }
 
     /**
@@ -62,7 +73,7 @@ export class Loop extends Object
      */
     [Symbol.iterator](){
         return {
-            next:  () => {
+            next: () => {
                 if(this.index <= this.length)
                 {
                     let nextValue = this.aCons.nth(this.index);
@@ -83,7 +94,7 @@ export class Loop extends Object
      */
     [Symbol.asyncIterator](){
         return {
-            next:  () => {
+            next: () => {
                 if(this.index <= this.length)
                 {
                     let nextValue = this.aCons.nth(this.index);

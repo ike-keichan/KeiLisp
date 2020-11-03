@@ -282,8 +282,9 @@ export class Cons extends Object
      */
     static parse(aString)
     {
-        let aParser = new Parser(aString);
-        return aParser.parse();
+        // let aParser = new Parser(aString);
+        // return aParser.parse(aString);
+        return Parser.parse(aString);
     }
 
     /**

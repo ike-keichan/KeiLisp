@@ -2,9 +2,6 @@
 
 "use strict";
 
-//モジュール「Cons」を読み込む。
-import { Cons } from './Cons.js';
-
 /**
  * @class
  * @classdesc 
@@ -88,7 +85,7 @@ export class Table extends Object
     }
 
 
-    trace(aString)
+    trace()
     {
         
     }

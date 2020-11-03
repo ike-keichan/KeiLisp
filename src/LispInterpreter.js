@@ -2,10 +2,10 @@
 
 "use strict";
 
-//モジュール「Table」を読み込む。
+// モジュール「Cons」を読み込む。
 import { Cons } from './Cons.js';
 
-//モジュール「Table」を読み込む。
+// モジュール「Table」を読み込む。
 import { Table } from './Table.js';
 
 /**
@@ -24,16 +24,12 @@ export class LispInterpreter extends Object
     constructor()
 	{
         super();
-
         // このインスタンスの環境を保持する変数
         this.root = this.initializeTable();
-
         // 入力を保持する変数
         this.inputBuffer = new Array();
-
         // レフトパーレンシスの数
         this.leftParentheses = 0;
-
         // コマンドラインの入出力を管理する変数
         this.rl = require('readline').createInterface({
             input: process.stdin,
@@ -53,7 +49,7 @@ export class LispInterpreter extends Object
         let aString = new String(); //入力列を別の変数に格納しておく。
 
         this.rl.prompt(); // プロンプトの出力
-        this.rl.on('line', (line) => { // コマンドラインの入力モードの処理と終了モードの処理
+        this.rl.on('line', async (line) => { // コマンドラインの入力モードの処理と終了モードの処理
             line += ' '; // 行の最後に空白文字を加えておく。
 
             //入力列からパーレンシスの有無を確認する。
@@ -122,19 +118,19 @@ export class LispInterpreter extends Object
 
     parse(input)
     {
-        let aCons = null;
+        let aCons = new Cons();
 
         // try
         // {
             aCons = Cons.parse(input);
         // }
-        // catch (e){
-        //     // Todo: RuntimeException作る
-        //     console.log('RuntimeException');
+        // catch (e)
+        // {
+        //     console.log("*** can not parse '" + input + "' ***")
         //     aCons = 'nil';
         // }
 
-        return aCons.toString();
+        return aCons;
     }
 
     /**

@@ -15,11 +15,12 @@ then
     "author": "Ikeda Keisuke（池田 敬祐）",
     "license": "BSD-2-Clause",
     "devDependencies": {
-        "eslint": "^7.3.1",
-        "jsdoc": "^3.6.5",
+        "eslint": "^7.12.1",
+        "jsdoc": "^3.6.6",
+        "ramda": "^0.27.1",
+        "readline": "^1.3.0",
         "webpack": "^4.44.1",
-        "webpack-cli": "^3.3.12",
-        "readline": "^1.3.0"
+        "webpack-cli": "^3.3.12"
     },
     "eslintConfig": {
         "env": {
@@ -43,4 +44,16 @@ then
     }
 }
 EOF
+fi
+
+if [ ! -e ./node_modules/.bin/readline ]
+then
+	echo 'Installing readline... '
+	npm install --save-dev readline 2> /dev/null | grep -e '+ readline' -e 'added [0-9]\+ packages'
+fi
+
+if [ ! -e ./node_modules/.bin/ramda ]
+then
+	echo 'Installing ramda... '
+	npm install --save-dev ramda 2> /dev/null | grep -e '+ ramda' -e 'added [0-9]\+ packages'
 fi
