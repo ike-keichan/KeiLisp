@@ -60,18 +60,39 @@ $ make test
 ### Example
 #### example1
 ```
->> (+ 1 2) // -> (+ . (1 . (2 . nil)))
+>> 1      // 1
 ```
 
 #### example2
 ```
->> 1 // -> 1
+>> a      // a
 ```
 
 #### example3
 ```
->> a // -> a
+>> nil    // nil
 ```
+
+#### example4
+```
+>> (+ 1 2) // (+ 1 2)
+```
+
+#### example5
+```
+>> '(1 . 2) // (quote (1 2))
+```
+
+#### example6
+```
+>> '(nil . 1) // (quote (nil . 1))
+```
+
+#### example6
+```
+>> '(1 . nil) // (quote (1 . NaN))
+```
+this is Bug!!
 
 ---
 
