@@ -1,9 +1,12 @@
 // #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 // モジュール「Cons」を読み込む。
 import { Cons } from './Cons.js';
+
+//モジュール「InterpreterSymbol」を読み込む。
+import { InterpreterSymbol } from './InterpreterSymbol';
 
 // モジュール「Table」を読み込む。
 import { Table } from './Table.js';
@@ -26,15 +29,11 @@ export class LispInterpreter extends Object
         super();
         // このインスタンスの環境を保持する変数
         this.root = this.initializeTable();
-        // 入力を保持する変数
-        this.inputBuffer = new Array();
-        // レフトパーレンシスの数
-        this.leftParentheses = 0;
         // コマンドラインの入出力を管理する変数
         this.rl = require('readline').createInterface({
             input: process.stdin,
             output: process.stdout,
-            prompt: ">> "
+            prompt: '>> '
         });
 
         return this;
@@ -46,34 +45,33 @@ export class LispInterpreter extends Object
      */
     run()
     {
-        let aString = new String(); //入力列を別の変数に格納しておく。
+        // Cons
+        let aCons = new Cons();
+        // 入力列を格納する変数
+        let aString = new String();
+        // レフトパーレンシスの数
+        let leftParentheses = 0;
 
         this.rl.prompt(); // プロンプトの出力
-        this.rl.on('line', async (line) => { // コマンドラインの入力モードの処理と終了モードの処理
-            line += ' '; // 行の最後に空白文字を加えておく。
+        this.rl.on('line', (line) => { // コマンドラインの入力モードの処理と終了モードの処理
+            line += '\n'; // 行の最後に空白文字を加えておく。
 
-            //入力列からパーレンシスの有無を確認する。
             for(let aCharacter of line)
             {
-                if(aCharacter == '(') { this.leftParentheses++ }
-                if(aCharacter == ')') { this.leftParentheses-- }
-                if(this.leftParentheses > 0){ aString += aCharacter; }
-                if(this.leftParentheses <= 0)
-                {
-                    aString += aCharacter;
-                    this.inputBuffer.push(aString);
-                    aString = new String();
-                }
+                if(aCharacter == '(') { leftParentheses++ }
+                if(aCharacter == ')') { leftParentheses-- }
+                aString += aCharacter;
             }
 
-            // パーレンシスがなくなったら値を評価し、プロンプトを出す。
-            if(this.leftParentheses <= 0)
-            {
-                this.inputBuffer.pop(); // 入力バッファに最後に入った空白文字を省く
-                this.inputBuffer.forEach(each => console.log(this.parse(each)) ); // 入力バッファの値をパースする。
-                this.inputBuffer = new Array(); // 入力バッファを初期化する
-                this.rl.prompt(); // プロンプトの出力
-            }
+           if(leftParentheses <= 0)
+           {
+               aCons = this.parse(aString);
+               for(let each of aCons.loop()){ console.log(each.toString()) }
+               leftParentheses = 0;
+               aString = new String();
+               this.rl.prompt(); // プロンプトの出力
+           }
+
         }).on('close', () => {
             console.log('\nBye!');
             process.exit(0);
@@ -81,6 +79,11 @@ export class LispInterpreter extends Object
 
         return null;
     }
+
+    // eval()
+    // {
+
+    // }
 
     /**
      * 環境の根を初期化するメソッド
@@ -92,41 +95,131 @@ export class LispInterpreter extends Object
         let aTable = new Table();
         aTable.setRoot(true);
 
-        aList.push("+");
-        aList.push("-");
-        aList.push("*");
-        aList.push("/");
-        aList.push("<");
-        aList.push("<=");
-        aList.push(">");
-        aList.push(">=");
-        aList.push("=");
-        aList.push("==");
+        aList.push('abs');
+        aList.push('add');
+        aList.push('and');
+        aList.push('apply');
+        aList.push('assoc');
+        aList.push('atom?');
+        aList.push('bind');
+        aList.push('car');
+        aList.push('cdr');
+        aList.push('character');
+        aList.push('cond');
+        aList.push('cons');
+        aList.push('copy');
+        aList.push('defun');
+        aList.push('divide');
+        aList.push('do');
+        aList.push('do*');
+        aList.push('dolist');
+        aList.push('double?');
+        aList.push('eq?');
+        aList.push('equal?');
+        aList.push('exit');
+        aList.push('gc');
+        aList.push('gentemp');
+        aList.push('if');
+        aList.push('integer?');
+        aList.push('lamda');
+        aList.push('let');
+        aList.push('let*');
+        aList.push('last');
+        aList.push('list');
+        aList.push('list?');
+        aList.push('mapcar');
+        aList.push('member');
+        aList.push('mod');
+        aList.push('multiply');
+        aList.push('nospy');
+        aList.push('not');
+        aList.push('notrace');
+        aList.push('nth');
+        aList.push('null?');
+        aList.push('nember?');
+        aList.push('or');
+        aList.push('pop!');
+        aList.push('progn');
+        aList.push('push!');
+        aList.push('quote');
+        aList.push('set!');
+        aList.push('set-all!');
+        aList.push('set-car!');
+        aList.push('set-car-all!');
+        aList.push('set-cdr!');
+        aList.push('set-cdr-all!');
+        aList.push('spy');
+        aList.push('subtract');
+        aList.push('string?');
+        aList.push('symbol?');
+        aList.push('time');
+        aList.push('trace');
+        aList.push('unless');
+        aList.push('when');
+        aList.push('+');
+        aList.push('-');
+        aList.push('*');
+        aList.push('/');
+        aList.push('=');
+        // aList.push('==');
+        aList.push('<');
+        aList.push('<=');
+        aList.push('>');
+        aList.push('>=');
 
         aList.forEach(each => {
-            let aSymbol = Symbol(each);
+            let aSymbol = InterpreterSymbol.of(each);
             aTable.set(aSymbol, aSymbol)
         });
+
+        let aString = new String();
+        let aCons = new Cons();
+        aString = "(lambda (list1 list2) (cond ((atom? list1) nil) ((atom? list2) nil) ((null? list1) list2) (t (cons (car list1) (append (cdr list1) list2)))))";
+        aCons = Cons.parse(aString);
+        aCons.last().setCdr(new Cons(aTable, 'nil'));
+        aTable.set(InterpreterSymbol.of('append'), aCons);
+
+        aString = "(lambda (l n) (cond ((<= (length l) n) nil) (t (cons (car l) (butlast (cdr l) n)))))";
+        aCons = Cons.parse(aString);
+        aCons.last().setCdr(new Cons(aTable, 'nil'));
+		aTable.set(InterpreterSymbol.of('butlast'), aCons);
+
+		aString = "(lambda (l) (cond ((atom? l) nil) ((null? l) 0)	(t (+ 1 (length (cdr l))))))";
+        aCons = Cons.parse(aString);
+        aCons.last().setCdr(new Cons(aTable, 'nil'));
+		aTable.set(InterpreterSymbol.of('length'), aCons);
+
+		aString = "(lambda (n l) (cond ((> n (length l)) nil) ((= 0 n) l) (t (nthcdr (- n 1) (cdr l)))))";
+        aCons = Cons.parse(aString);
+        aCons.last().setCdr(new Cons(aTable, 'nil'));
+		aTable.set(InterpreterSymbol.of('nthcdr'), aCons);
+
+		aString = "(lambda (l) (cond ((atom? l) l) ((null? l) '()) (t (append (reverse (cdr l)) (list (car l))))))";
+        aCons = Cons.parse(aString);
+        aCons.last().setCdr(new Cons(aTable, 'nil'));
+        aTable.set(InterpreterSymbol.of('reverse'), aCons);
+        
+        aTable.set(InterpreterSymbol.of('t'), InterpreterSymbol.of('t'));
 
         return aTable;
     }
 
-    // eval()
-    // {
-
-    // }
-
+    /**
+     * 引数の文字列を解析し、リストにして応答するメソッド
+     * @param {String} input 解析を行う文字列
+     * @return {Cons} 解析を終えたリスト
+     */
     parse(input)
     {
         let aCons = new Cons();
 
         // try
         // {
-            aCons = Cons.parse(input);
+            aCons = Cons.parse('(' + input + '\n);');
         // }
         // catch (e)
         // {
-        //     console.log("*** can not parse '" + input + "' ***")
+        //     console.log('*** can not parse '' + input + '' ***')
         //     aCons = 'nil';
         // }
 

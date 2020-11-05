@@ -51,21 +51,21 @@ export class Loop extends Object
      * 次の要素を応答するメソッド
      * @return {Object} 自身
      */
-    async next() 
-    {
-        let anObject = await (() =>
-        {
-            let anotherObject = this.aCons.nth(this.index);
-            this.remove();
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve(anotherObject);
-                }, 2000);
-            })
-        })();
+    // async next() 
+    // {
+    //     let anObject = await (() =>
+    //     {
+    //         let anotherObject = this.aCons.nth(this.index);
+    //         this.remove();
+    //         return new Promise(resolve => {
+    //             setTimeout(() => {
+    //                 resolve(anotherObject);
+    //             }, 2000);
+    //         })
+    //     })();
 
-        return anObject;
-    }
+    //     return anObject;
+    // }
 
     /**
      * 反復可能プロトコルiteratorの実装

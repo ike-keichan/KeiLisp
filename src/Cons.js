@@ -2,11 +2,14 @@
 
 "use strict";
 
-//モジュール「Parser」を読み込む。
-import { Parser } from './Parser';
+//モジュール「InterpreterSymbol」を読み込む。
+import { InterpreterSymbol } from './InterpreterSymbol';
 
 //モジュール「Loop」を読み込む。
 import { Loop } from './Loop';
+
+//モジュール「Parser」を読み込む。
+import { Parser } from './Parser';
 
 //モジュール「Table」を読み込む。
 import { Table } from './Table';
@@ -180,13 +183,13 @@ export class Cons extends Object
     }
 
     /**
-     * 引数がシンボルかどうかを判別し、応答するメソッド
+     * 引数が自作シンボルかどうかを判別し、応答するメソッド
      * @param {*} anObject 判別するオブジェクト
      * @return {Boolean} 真偽値
      */
     static isSymbol(anObject)
     {
-        return anObject instanceof Symbol;
+        return anObject instanceof InterpreterSymbol;
     }
 
     /**
@@ -258,8 +261,8 @@ export class Cons extends Object
 
     /**
 	 * Consのn番目の要素を応答するメソッド
-	 * @param aNumber 指定する番号
-	 * @return anObject 指定した番号の要素
+	 * @param {Number} aNumber 指定する番号
+	 * @return {Cons} 指定した番号の要素
 	 */
     nth(aNumber)
     {
@@ -273,6 +276,7 @@ export class Cons extends Object
             aCons = aCons.cdr;
         }
 
+        return aCons;
     }
 
     /**
@@ -282,8 +286,6 @@ export class Cons extends Object
      */
     static parse(aString)
     {
-        // let aParser = new Parser(aString);
-        // return aParser.parse(aString);
         return Parser.parse(aString);
     }
 
@@ -323,11 +325,11 @@ export class Cons extends Object
     }
 
     /**
-     * 自身を整形し、文字列として返すメソッド
+     * 自身を整形し、Cons状の文字列として返すメソッド
      * @return {String} 自身を整形した文字列を返す。
      */
     toString()
     {
-        return String('(' + this.car + ' . ' + this.cdr + ')');
+        return String('(' + this.car.toString() + ' . ' + this.cdr.toString() + ')');
     }
 }

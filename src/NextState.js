@@ -2,9 +2,6 @@
 
 "use strict";
 
-// モジュール「Parser」を読み込む。
-// import { Parser } from './Parser';
-
 // ライブラリ「Ramda」を読み込む。
 import * as R from 'ramda'; 
 
@@ -36,17 +33,6 @@ export class NextState extends Object
     }
 
     /**
-     * automatonを設定するメソッド
-     * @param {Parser} anAutomaton
-     * @return {Null} 何も返さない
-     */
-    setAutomaton(anAutomaton)
-    {
-        this.automaton = anAutomaton;
-        return null;
-    }
-
-    /**
      * エラーを検知し、応答するメソッド
      * @param {String} aString エラー内容
      */
@@ -75,14 +61,14 @@ export class NextState extends Object
         }
 
         let aNumber = -1;
-        try
-        {
+        // try
+        // {
             if(this.nextState != null){ aNumber = this.nextState; }
             let toDoMethod = R.invoker(0, this.methodName);
             let anObject = toDoMethod(this.automaton);
             if(anObject != null){ aNumber = Number(anObject); }
-        }
-        catch(e) { this.fatal("IllegalAccessException (NextState in Parser, next)"); }
+        // }
+        // catch(e) { this.fatal("IllegalAccessException (NextState in Parser, next)"); }
         // Todo:エラー処理
 
         return Number(aNumber);

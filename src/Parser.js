@@ -5,6 +5,9 @@
 // モジュール「Cons」を読み込む。
 import { Cons } from './Cons.js';
 
+//モジュール「InterpreterSymbol」を読み込む。
+import { InterpreterSymbol } from './InterpreterSymbol';
+
 // モジュール「IntStream」を読み込む。
 import { IntStream } from './IntStream.js';
 
@@ -75,19 +78,18 @@ export class Parser extends Object
     }
 
     /**
-     * 引数の1文字を入力とし、解析を始めるメソッド
-     * @param {*} aCharacter 解析する1文字
+     * パースする文字列のある1文字を引数とし、パースするメソッド
+     * @param {*} aCharacter パースする1文字
      * @return {Null} 何も返さない 
      */
-    async input(aCharacter = (() => {
+    input(aCharacter = (() => {
         let aCharacter = this.nextChar();
         return (aCharacter != null) ? aCharacter : null;
     })())
     {
+        // Mapオブジェクト「states」から変数stateに合ったTableオブジェクトを取得し、変数inputsに束縛する。
         let inputs = new Map();
-        inputs = await this.states.get(Number(this.state));
-        console.log("======================")
-        console.log(inputs.get("0"))
+        inputs = this.states.get(Number(this.state));
 
         // let inputs = new Map();
         // inputs = await (() =>
@@ -100,9 +102,9 @@ export class Parser extends Object
         //     })
         // })();
 
+        // Tableオブジェクト「inputs」から引数の1文字「aCharacter」の文字コードに対応したメソッドを実行し、値を取得する。
         let aNumber = new Number();
         aNumber = (String(aCharacter.charCodeAt(0))) ? inputs.get(String(aCharacter.charCodeAt(0))).next(this) : inputs.get(String(128)).next(this);
-        console.log('ddd:' + aNumber)
 
         // let aNumber = new Number();
         // aNumber = await ((inputs) =>
@@ -122,7 +124,8 @@ export class Parser extends Object
     }
 
     /**
-     * 
+     * パースする文字列から次にパースする1文字を応答するメソッド
+     * @return {String} 次にパースする1文字
      */
     nextChar()
     {
@@ -150,7 +153,7 @@ export class Parser extends Object
 
     /**
      * 次のトークンを確認し、応答するメソッド
-     * @return {} トークン
+     * @return {Cons} トークン
      */
     nextToken()
     {
@@ -166,13 +169,12 @@ export class Parser extends Object
             if(this.state != 0){ this.fatal("Syntax Error!22"); }
         }
         this.tokenString = "";
-        console.log('aaa:' + this.token)
 
         return this.token;
     }
 
     /**
-     * 次の状態を保持するクラス「NextState」をインスタンス化し、応答するメソッド
+     * クラス「NextState」をインスタンス化し、応答するメソッド
      * @return {NextState} 次の状態
      */
     nextState(aNumber, aString)
@@ -181,7 +183,7 @@ export class Parser extends Object
     }
 
     /**
-     * 引数をパース（構文解析）し、応答するメソッド
+     * 引数の文字列をパースし、応答するメソッド
      * @param {String} aString
      * @return {*}  
      */
@@ -250,12 +252,12 @@ export class Parser extends Object
             this.nextChar();
             this.token = "nil";
         }
-        else{ this.token  = this.parseListAUX(); }
+        else { this.token  = this.parseListAUX(); }
 
         return 0;
     }
 
-    parseListAux()
+    parseListAUX()
     {
         this.skippingSpaces();
         if (this.peekChar() == '#' || this.peekChar() == '%')
@@ -277,6 +279,7 @@ export class Parser extends Object
             this.skippingSpaces();
             if (this.rightParen() == false) { this.fatal("Syntax Error!"); }
             this.nextChar();
+
             return cdr;
         }
         else
@@ -289,7 +292,7 @@ export class Parser extends Object
     quote()
     {
         let anObject = new Cons(this.nextToken(), 'nil');
-        this.token = new Cons(Symbol.of("quote"), anObject);
+        this.token = new Cons(InterpreterSymbol.of("quote"), anObject);
         return Number(0);
     }
 
@@ -297,13 +300,13 @@ export class Parser extends Object
     {
         let aNumber = (this.peekChar() == '\\') ? 3 : 2;
         if (this.peekChar(aNumber) == '\'') { aNumber = 11; }
-        else { aNumber = (this.quote()).intValue(); }
+        else { aNumber = this.quote(); }
         return aNumber;
     }
 
     rightParen()
     {
-        return (this.peekChar() == ')' || this.peekChar() == ']' || this.peekChar() == '}');
+        return (this.peekChar() == ")" || this.peekChar() == "]" || this.peekChar() == "}" );
     }
 
     sign()
@@ -320,11 +323,11 @@ export class Parser extends Object
 
     skippingSpaces()
     {
-        while(this.nexts[1] == String(9) || this.nexts[1] == String(10) || this.nexts[1] == String(11) || this.nexts[1] == String(12) || this.nexts[1] == String(13) || this.nexts[1] == String(32))
+        while(this.nexts[1] == String.fromCodePoint(9) || this.nexts[1] == String.fromCodePoint(10) || this.nexts[1] == String.fromCodePoint(11) || this.nexts[1] == String.fromCodePoint(12) || this.nexts[1] == String.fromCodePoint(13) || this.nexts[1] == String.fromCodePoint(32))
         {
             this.nextChar();
         }
-
+        
         return null;
     }
 
@@ -364,8 +367,7 @@ export class Parser extends Object
         let aCharacter = this.tokenString[0];
         if(aCharacter == '+'){ this.tokenString = this.tokenString.substring(1, this.tokenString.length); }
         this.token = Number(this.tokenString);
-        console.log('bbb:' + this.token)
-        return null;
+        return;
     }
 
     tokenToString()
@@ -376,8 +378,8 @@ export class Parser extends Object
 
     tokenToSymbol()
     {
-        this.token = Symbol(this.tokenString);
-        if (this.token ==  Symbol("nil")) { this.token = "nil"; }
+        this.token = InterpreterSymbol.of(this.tokenString);
+        if (this.token ==  InterpreterSymbol.of("nil")) { this.token = "nil"; }
         return;
     }
 
