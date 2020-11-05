@@ -21,10 +21,6 @@ $(TARGET_SCRIPT): $(SCRIPTS)
 	@sh ./PrepareWebpack.sh
 	npx webpack --progress --display-modules #--verbose
 
-prepare:
-	@sh ./PrepareESLint.sh
-	@sh ./PrepareJSDoc.sh
-
 clean:
 	rm -f ./Example.js
 	@if [ -e $(INSTDIR) ] ; then echo "rm -f -r $(INSTDIR)" ; rm -f -r $(INSTDIR) ; fi
@@ -50,9 +46,11 @@ zip: wipe
 tgz: wipe
 	(cd ../ ; tar --exclude='*/.svn/*' -czvf ./$(ARCHIVE).tar.gz ./$(ARCHIVE)/)
 
-lint: prepare
+lint:
+	@sh ./PrepareESLint.sh
 	$(LINTER) $(SCRIPTS)
 
-doc: prepare
+doc:
+	@sh ./PrepareJSDoc.sh
 	$(JSDOC) $(SCRIPTS)
 	open -a $(BROWSER) $(DOC_HTML)

@@ -2,6 +2,8 @@
 
 "use strict";
 
+// import "@babel/polyfill";
+
 //モジュール「LispInterpreter」を読み込む。
 import { LispInterpreter } from './LispInterpreter.js';
 

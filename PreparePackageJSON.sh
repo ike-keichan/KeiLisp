@@ -2,6 +2,7 @@
  
 if [ ! -e ./package.json ]
 then
+    echo '-----Prepare package.json  -----'
     cat << EOF > ./package.json
 {
     "name": "JSLisp",
@@ -15,12 +16,26 @@ then
     "author": "Ikeda Keisuke（池田 敬祐）",
     "license": "BSD-2-Clause",
     "devDependencies": {
+        "@babel/core": "^7.12.3",
+        "@babel/plugin-proposal-class-properties": "^7.12.1",
+        "@babel/preset-env": "^7.12.1",
+        "babel-loader": "^8.1.0",
         "eslint": "^7.12.1",
         "jsdoc": "^3.6.6",
         "ramda": "^0.27.1",
         "readline": "^1.3.0",
-        "webpack": "^4.44.1",
+        "webpack": "^4.44.2",
         "webpack-cli": "^3.3.12"
+    },
+    "babel": {
+        "plugins": [
+            "@babel/plugin-proposal-class-properties"
+        ],
+        "presets": [
+            ["@babel/preset-env", {
+                "useBuiltIns": "usage"
+            }]
+        ]
     },
     "eslintConfig": {
         "env": {
@@ -46,14 +61,23 @@ then
 EOF
 fi
 
+if [ ! -e ./node_modules/.bin/babel-loader -o ! -e ./node_modules/.bin/@babel ]
+then
+	echo '-----Installing babel...   -----'
+	npm install --save-dev babel-loader 2> /dev/null | grep -e '+ babel-loader' -e 'added [0-9]\+ packages'
+	npm install --save-dev @babel/core 2> /dev/null | grep -e '+ @babel/core' -e 'added [0-9]\+ packages'
+	npm install --save-dev @babel/preset-env 2> /dev/null | grep -e '+ @babel/preset-env' -e 'added [0-9]\+ packages'
+	npm install --save-dev @babel/plugin-proposal-class-properties 2> /dev/null | grep -e '+ @babel/plugin-proposal-class-properties' -e 'added [0-9]\+ packages'
+fi
+
 if [ ! -e ./node_modules/.bin/readline ]
 then
-	echo 'Installing readline... '
+	echo '-----Installing readline...-----'
 	npm install --save-dev readline 2> /dev/null | grep -e '+ readline' -e 'added [0-9]\+ packages'
 fi
 
 if [ ! -e ./node_modules/.bin/ramda ]
 then
-	echo 'Installing ramda... '
+	echo '-----Installing ramda...   -----'
 	npm install --save-dev ramda 2> /dev/null | grep -e '+ ramda' -e 'added [0-9]\+ packages'
 fi

@@ -12,6 +12,7 @@ import { Table } from "./Table";
  */
 export class InterpreterSymbol extends Object
 {
+    static table = new Table();
 
     /**
      * コンストラクタメソッド
