@@ -35,11 +35,12 @@ export class NextState extends Object
     /**
      * エラーを検知し、応答するメソッド
      * @param {String} aString エラー内容
+     * @return {Null} 何も返さない
      */
     fatal(aString)
     {
-        // Todo:エラー処理
-        console.log(aString);
+        console.log(aString); // Todo:エラー処理
+        return null;
     }
 
     /**
@@ -56,20 +57,18 @@ export class NextState extends Object
             {
                 this.method = this.automaton[this.methodName];
             }
-            catch(e){ this.fatal("Not Found Method: " + this.methodName); }
-            // Todo:エラー処理
+            catch(e){ this.fatal("Not Found Method: " + this.methodName); } // Todo:エラー処理
         }
 
         let aNumber = -1;
-        // try
-        // {
+        try
+        {
             if(this.nextState != null){ aNumber = this.nextState; }
             let toDoMethod = R.invoker(0, this.methodName);
             let anObject = toDoMethod(this.automaton);
             if(anObject != null){ aNumber = Number(anObject); }
-        // }
-        // catch(e) { this.fatal("IllegalAccessException (NextState in Parser, next)"); }
-        // Todo:エラー処理
+        }
+        catch(e) { this.fatal("Not Invoke Method: " + this.methodName); } // Todo:エラー処理
 
         return Number(aNumber);
     }

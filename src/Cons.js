@@ -22,6 +22,8 @@ import { Table } from './Table';
  */
 export class Cons extends Object
 {
+    static nil = new Cons();
+
     /**
      * コンストラクタメソッド
      * @constructor
@@ -29,7 +31,7 @@ export class Cons extends Object
      * @param {*} cdr cdr、引数なしでnilが参照される。
      * @return {Cons} 自身
      */
-    constructor(car = 'nil', cdr = 'nil')
+    constructor(car = Cons.nil, cdr = Cons.nil)
     {
         super();
         this.car = car;
@@ -45,7 +47,7 @@ export class Cons extends Object
      */
     add(anObject)
     {
-        let aCons = new Cons(anObject, 'nil');
+        let aCons = new Cons(anObject, Cons.nil);
         return this.nconc(aCons);
     }
 
@@ -66,7 +68,7 @@ export class Cons extends Object
     static cloneValue(value)
     {
         if(Cons.isCons(value))  { return value.clone(); }
-        if(Cons.isNil(value))   { return 'nil' }
+        if(Cons.isNil(value))   { return Cons.nil }
         if(Cons.isNumber(value)){ return Number(value); }
         if(Cons.isString(value)){ return String(value); }
         if(Cons.isSymbol(value)){ return value; }
@@ -119,7 +121,7 @@ export class Cons extends Object
      */
     static isCons(anObject)
     {
-        return (anObject != 'nil') && (anObject instanceof Cons);
+        return (anObject != Cons.nil) && (anObject instanceof Cons);
     }
 
     /**
@@ -139,7 +141,7 @@ export class Cons extends Object
      */
     static isNil(anObject)
     {
-        return anObject == 'nil';
+        return anObject == Cons.nil;
     }
 
     /**
@@ -208,7 +210,7 @@ export class Cons extends Object
      */
     last()
     {
-        let aCons = new Cons('nil', this);
+        let aCons = new Cons(Cons.nil, this);
         let anotherCons = this;
 
         while(Cons.isCons(anotherCons))
@@ -266,7 +268,7 @@ export class Cons extends Object
 	 */
     nth(aNumber)
     {
-        if(aNumber <= 0){ return 'nil' }
+        if(aNumber <= 0){ return Cons.nil }
         let count = 1;
         let aCons = this;
         while (Cons.isCons(aCons))
@@ -276,7 +278,7 @@ export class Cons extends Object
             aCons = aCons.cdr;
         }
 
-        return aCons;
+        return Cons.nil;
     }
 
     /**
@@ -325,11 +327,75 @@ export class Cons extends Object
     }
 
     /**
-     * 自身を整形し、Cons状の文字列として返すメソッド
-     * @return {String} 自身を整形した文字列を返す。
+     * 自身を整形し、文字列として返すメソッド
+     * @return {String} 自身を整形した文字列
      */
     toString()
     {
-        return String('(' + this.car.toString() + ' . ' + this.cdr.toString() + ')');
+        let aString = new String();
+        if(Cons.isNil(this)){ aString += Cons.toString(Cons.nil); }
+        else
+        {
+            aString += '(' + Cons.toString(this.car);
+
+            if(Cons.isNil(this.cdr))
+            {
+                aString += ')';
+            }
+            else if(this.cdr instanceof Cons == false)
+            {
+                aString += ' . ' + Cons.toString(this.cdr) + ')';
+            }
+            else
+            {
+                let aCons = this.cdr;
+                while(true)
+                {
+                    let head = aCons.car;
+                    let tail = aCons.cdr;
+                    if(head instanceof Table == false)
+                    {
+                        aString += ' ' + Cons.toString(head);
+                    }
+                    if(Cons.isNil(tail))
+                    {
+                        aString += ')';
+                        break;
+                    }
+                    if(tail instanceof Cons == false)
+                    {
+                        aString += ' . ' + Cons.toString(tail) + ')';
+                        break;
+                    }
+                    aCons = tail;
+                }
+            }
+        }
+
+        return aString;
+    }
+
+    /**
+     * 引数のオブジェクトを整形し、文字列として返すメソッド
+     * @param {Object} anObject 整形するオブジェクト 
+     * @return {String} 整形した文字列
+     */
+    static toString(anObject)
+    {
+        let aString = new String();
+        if(Cons.isNil(anObject))
+        {
+            aString += 'nil';
+        }
+        else if(anObject instanceof String)
+        {
+            aString += "\"" + anObject.toString() + "\"";
+        }
+        else
+        {
+            aString += anObject.toString();
+        }
+
+        return aString;
     }
 }

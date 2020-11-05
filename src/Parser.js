@@ -14,7 +14,7 @@ import { IntStream } from './IntStream.js';
 // モジュール「NextState」を読み込む。
 import { NextState } from './NextState.js';
 
-//
+// 一時的に読み込む最大文字数
 const PEEKCOUNT = 10;
 
 /**
@@ -36,7 +36,7 @@ export class Parser extends Object
         super();
         this.stream = aString[Symbol.iterator]();
         this.token
-        this.tokenString = new String();
+        this.tokenString = '';
         this.states = new Map();
         this.state = 0;
         this.initializeStateTransitionTable();
@@ -69,12 +69,13 @@ export class Parser extends Object
     /**
      * エラーを検知し、応答するメソッド
      * @param {String} aString エラー内容
-     * @return 
+     * @return {Null} 何も返さない
      */
     fatal(aString)
     {
-        // Todo:エラー処理
-        console.log(aString);
+        console.log(aString); // Todo:エラー処理
+
+        return null;
     }
 
     /**
@@ -91,33 +92,11 @@ export class Parser extends Object
         let inputs = new Map();
         inputs = this.states.get(Number(this.state));
 
-        // let inputs = new Map();
-        // inputs = await (() =>
-        // {
-        //     inputs = this.states.get(Number(this.state));
-        //     return new Promise(resolve => {
-        //         setTimeout(() => {
-        //             resolve(inputs);
-        //         }, 0);
-        //     })
-        // })();
-
         // Tableオブジェクト「inputs」から引数の1文字「aCharacter」の文字コードに対応したメソッドを実行し、値を取得する。
         let aNumber = new Number();
         aNumber = (String(aCharacter.charCodeAt(0))) ? inputs.get(String(aCharacter.charCodeAt(0))).next(this) : inputs.get(String(128)).next(this);
 
-        // let aNumber = new Number();
-        // aNumber = await ((inputs) =>
-        // {
-        //     aNumber = (String(aCharacter.charCodeAt(0))) ? inputs.get(String(aCharacter.charCodeAt(0))).next(this) : inputs.get(String(128)).next(this);
-        //     return new Promise(resolve => {
-        //         setTimeout(() => {
-        //             resolve(aNumber);
-        //         }, 0);
-        //     })
-        // })(inputs);
-
-        if(aNumber < 0){ this.fatal("Syntax Error!11"); }
+        if(aNumber < 0){ this.fatal("Syntax Error!"); }　// Todo:エラー処理
         this.state = aNumber;
 
         return null;
@@ -129,6 +108,7 @@ export class Parser extends Object
      */
     nextChar()
     {
+        // 文字を文字コードに変換して変数aNumberに格納する。
         let aCharacter = null;
         try
         {   
@@ -138,8 +118,9 @@ export class Parser extends Object
             })()
             if(aNumber >= 0){ aCharacter = String.fromCodePoint(aNumber); }
         }
-        catch(e){ this.fatal("Read Error!"); }
-        // Todo:エラー処理
+        catch(e){ this.fatal("Read Error!"); } // Todo:エラー処理
+
+        // 解析する文字列を1文字ずらす。
         let count = 0;
         while(count < PEEKCOUNT)
         {
@@ -166,7 +147,7 @@ export class Parser extends Object
         }
         if(this.atEnd())
         {
-            if(this.state != 0){ this.fatal("Syntax Error!22"); }
+            if(this.state != 0){ this.fatal("Syntax Error!"); }　// Todo:エラー処理
         }
         this.tokenString = "";
 
@@ -198,16 +179,24 @@ export class Parser extends Object
      */
     peekChar(aNumber = 1)
     {
-        if(aNumber > this.nexts.length){ this.fatal("Read Error!") }
+        if(aNumber > this.nexts.length){ this.fatal("Read Error!") } // Todo:エラー処理
         return this.nexts[aNumber];
     }
 
+    /**
+     * NextStateによって呼び出される、文字連結を行うメソッド
+     * @return {Null} 何も返さない
+     */
     concat()
     {
         this.concatCharacter();
         return null;
     }
 
+    /**
+     * NextStateによって呼び出される、Number型(倍精度浮動小数点数：擬似的なDouble型)のトークン番号で応答するメソッド
+     * @return {Number} トークン番号
+     */
     doubleToken()
     {
         this.concat();
@@ -220,6 +209,10 @@ export class Parser extends Object
         return 3;
     }
 
+    /**
+     * NextStateによって呼び出される、Number型(倍精度浮動小数点数：擬似的なDouble型)のトークン番号で応答するメソッド
+     * @return {Number} トークン番号
+     */
     doubleTokenAUX()
     {
         this.concat();
@@ -232,6 +225,10 @@ export class Parser extends Object
         return 5;
     }
 
+    /**
+     * NextStateによって呼び出される、Number型(整数値：擬似的なInteger型)のトークン番号で応答するメソッド
+     * @return {Number} トークン番号
+     */
     integerToken()
     {
         this.concat();
@@ -244,19 +241,27 @@ export class Parser extends Object
         return 2;
     }
 
+    /**
+     * NextStateによって呼び出される、トークンをリスト（Cons）にし、トークンをリスト（Cons）のトークン番号で応答するメソッド
+     * @return {Number} トークン番号
+     */
     parseList()
     {
         this.skippingSpaces();
         if(this.rightParen())
         {
             this.nextChar();
-            this.token = "nil";
+            this.token = Cons.nil;
         }
         else { this.token  = this.parseListAUX(); }
 
         return 0;
     }
 
+    /**
+     * NextStateによって呼び出される、トークンをリスト（Cons）にするためのメソッド
+     * @return {Cons} 作ったリスト（Cons）
+     */
     parseListAUX()
     {
         this.skippingSpaces();
@@ -269,7 +274,7 @@ export class Parser extends Object
         if (this.rightParen())
         {
             this.nextChar();
-            return 'nil';
+            return Cons.nil;
         }
         else if (this.peekChar() == '.')
         {
@@ -277,7 +282,7 @@ export class Parser extends Object
             this.state = 0;
             let cdr = this.nextToken();
             this.skippingSpaces();
-            if (this.rightParen() == false) { this.fatal("Syntax Error!"); }
+            if (this.rightParen() == false) { this.fatal("Syntax Error!"); } // Todo:エラー処理
             this.nextChar();
 
             return cdr;
@@ -289,26 +294,44 @@ export class Parser extends Object
         }
     }
 
+    /**
+     * NextStateによって呼び出される、クォートを認識し、トークンをリスト（Cons）にしてトークン番号を応答するメソッド
+     * @return {Number} トークン番号
+     */
     quote()
     {
-        let anObject = new Cons(this.nextToken(), 'nil');
+        let anObject = new Cons(this.nextToken(), Cons.nil);
         this.token = new Cons(InterpreterSymbol.of("quote"), anObject);
+
         return Number(0);
     }
 
+    /**
+     * NextStateによって呼び出される、クォートまたはString型の0オリジン(擬似的なCharacter型)のトークン番号を応答するメソッド
+     * @return {Number} トークン番号
+     */
     quoteOrChar()
     {
         let aNumber = (this.peekChar() == '\\') ? 3 : 2;
         if (this.peekChar(aNumber) == '\'') { aNumber = 11; }
         else { aNumber = this.quote(); }
+
         return aNumber;
     }
 
+    /**
+     * NextStateによって呼び出される、右括弧(')', ']', '}')を判別し、応答するメソッド
+     * @return {Boolean}　真偽値
+     */
     rightParen()
     {
-        return (this.peekChar() == ")" || this.peekChar() == "]" || this.peekChar() == "}" );
+        return (this.peekChar() == ')' || this.peekChar() == ']' || this.peekChar() == '}' );
     }
 
+    /**
+     * NextStateによって呼び出される、記号（'+', '-'）のトークン番号で応答するメソッド
+     * @return {Number} トークン番号
+     */
     sign()
     {
         this.concat();
@@ -321,6 +344,10 @@ export class Parser extends Object
         return 7;
     }
 
+    /**
+     * NextStateによって呼び出される、空白文字を無視するメソッド
+     * @return {Null} 何も返さない
+     */
     skippingSpaces()
     {
         while(this.nexts[1] == String.fromCodePoint(9) || this.nexts[1] == String.fromCodePoint(10) || this.nexts[1] == String.fromCodePoint(11) || this.nexts[1] == String.fromCodePoint(12) || this.nexts[1] == String.fromCodePoint(13) || this.nexts[1] == String.fromCodePoint(32))
@@ -331,6 +358,10 @@ export class Parser extends Object
         return null;
     }
 
+    /**
+     * NextStateによって呼び出される、InterpreterSymbol型のトークン番号で応答するメソッド
+     * @return {Number} トークン番号
+     */
     symbolToken()
     {
         this.concat();
@@ -343,18 +374,30 @@ export class Parser extends Object
         return 8;
     }
 
+    /**
+     * NextStateによって呼び出される、トークンをString型の0オリジン(擬似的なCharacter型)にするメソッド
+     * @return {Null} 何も返さない
+     */
     tokenToCharacter()
     {
         this.token = String(this.tokenString[0]);
         return;
     }
 
+    /**
+     * NextStateによって呼び出される、トークンをNumber型(倍精度浮動小数点数：擬似的なDouble型)にするメソッド
+     * @return {Null} 何も返さない
+     */
     tokenToDouble()
     {
         this.token = Number(this.tokenString);
         return;
     }
 
+    /**
+     * NextStateによって呼び出される、トークンをNumber型(倍精度浮動小数点数：擬似的なDouble型)にするメソッド
+     * @return {Null} 何も返さない
+     */
     tokenToDoubleAUX()
     {
         this.concat();
@@ -362,6 +405,10 @@ export class Parser extends Object
         return;
     }
 
+    /**
+     * NextStateによって呼び出される、トークンをNumber型(整数値：擬似的なInteger型)にするメソッド
+     * @return {Null} 何も返さない
+     */
     tokenToInteger()
     {
         let aCharacter = this.tokenString[0];
@@ -370,17 +417,25 @@ export class Parser extends Object
         return;
     }
 
+    /**
+     * NextStateによって呼び出される、トークンをString型にするメソッド
+     * @return {Null} 何も返さない
+     */
     tokenToString()
     {
         this.token = this.tokenString;
-        return;
+        return null;
     }
 
+    /**
+     * NextStateによって呼び出される、トークンをInterpreterSymbol型にするメソッド
+     * @return {Null} 何も返さない
+     */
     tokenToSymbol()
     {
         this.token = InterpreterSymbol.of(this.tokenString);
-        if (this.token ==  InterpreterSymbol.of("nil")) { this.token = "nil"; }
-        return;
+        if (this.token ==  InterpreterSymbol.of("nil")) { this.token = Cons.nil; }
+        return null;
     }
 
     /**

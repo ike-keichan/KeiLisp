@@ -12,7 +12,10 @@ import { Table } from "./Table";
  */
 export class InterpreterSymbol extends Object
 {
-    static table = new Table();
+    /**
+     * InterpreterSymbolを記憶させるテーブル
+     */
+    static table = new Table(); // Todo: どうにかできたらする
 
     /**
      * コンストラクタメソッド
@@ -50,11 +53,16 @@ export class InterpreterSymbol extends Object
         return this === anObject;
     }
     
+    /**
+     * 同じ印字名に対して同一のシンボルを応答するメソッド
+     * @param {String} aString 印字名
+     * @return aSymbol 引数と同一のシンボル
+     */
     static of(aString)
     {
         let aSymbol = null;
         try { aSymbol = this.table.get(aString); }
-        catch(e){  }
+        catch(e){  }  // Todo:エラー処理
         
 
         if(aSymbol == null)

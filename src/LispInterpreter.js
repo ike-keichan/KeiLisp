@@ -65,7 +65,7 @@ export class LispInterpreter extends Object
 
            if(leftParentheses <= 0)
            {
-               aCons = this.parse(aString);
+               aCons = this.parse(aString) 
                for(let each of aCons.loop()){ console.log(each.toString()) }
                leftParentheses = 0;
                aString = new String();
@@ -176,27 +176,27 @@ export class LispInterpreter extends Object
         let aCons = new Cons();
         aString = "(lambda (list1 list2) (cond ((atom? list1) nil) ((atom? list2) nil) ((null? list1) list2) (t (cons (car list1) (append (cdr list1) list2)))))";
         aCons = Cons.parse(aString);
-        aCons.last().setCdr(new Cons(aTable, 'nil'));
+        aCons.last().setCdr(new Cons(aTable, Cons.nil));
         aTable.set(InterpreterSymbol.of('append'), aCons);
 
         aString = "(lambda (l n) (cond ((<= (length l) n) nil) (t (cons (car l) (butlast (cdr l) n)))))";
         aCons = Cons.parse(aString);
-        aCons.last().setCdr(new Cons(aTable, 'nil'));
+        aCons.last().setCdr(new Cons(aTable, Cons.nil));
 		aTable.set(InterpreterSymbol.of('butlast'), aCons);
 
 		aString = "(lambda (l) (cond ((atom? l) nil) ((null? l) 0)	(t (+ 1 (length (cdr l))))))";
         aCons = Cons.parse(aString);
-        aCons.last().setCdr(new Cons(aTable, 'nil'));
+        aCons.last().setCdr(new Cons(aTable, Cons.nil));
 		aTable.set(InterpreterSymbol.of('length'), aCons);
 
 		aString = "(lambda (n l) (cond ((> n (length l)) nil) ((= 0 n) l) (t (nthcdr (- n 1) (cdr l)))))";
         aCons = Cons.parse(aString);
-        aCons.last().setCdr(new Cons(aTable, 'nil'));
+        aCons.last().setCdr(new Cons(aTable, Cons.nil));
 		aTable.set(InterpreterSymbol.of('nthcdr'), aCons);
 
 		aString = "(lambda (l) (cond ((atom? l) l) ((null? l) '()) (t (append (reverse (cdr l)) (list (car l))))))";
         aCons = Cons.parse(aString);
-        aCons.last().setCdr(new Cons(aTable, 'nil'));
+        aCons.last().setCdr(new Cons(aTable, Cons.nil));
         aTable.set(InterpreterSymbol.of('reverse'), aCons);
         
         aTable.set(InterpreterSymbol.of('t'), InterpreterSymbol.of('t'));
@@ -211,17 +211,14 @@ export class LispInterpreter extends Object
      */
     parse(input)
     {
-        let aCons = new Cons();
+        let aCons = null;
 
-        // try
-        // {
-            aCons = Cons.parse('(' + input + '\n);');
-        // }
-        // catch (e)
-        // {
-        //     console.log('*** can not parse '' + input + '' ***')
-        //     aCons = 'nil';
-        // }
+        try { aCons = Cons.parse('(' + input + '\n);'); }
+        catch (e)
+        {
+            console.log('*** can not parse ' + input.replace( /\n/g , "" ) + ' ***')
+            aCons = Cons.nil;
+        }
 
         return aCons;
     }

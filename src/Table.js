@@ -39,10 +39,7 @@ export class Table extends Map
         {
             let value = Cons.cloneValue(this.get(key));
             if(value != null){ aTable.set(key, value); }
-            else { 
-                // Todo: RuntimeException作る 
-                console.log('RuntimeException');
-            }
+            else { console.log('RuntimeException'); } // Todo:エラー処理
         }
 
         return aTable;
