@@ -45,7 +45,7 @@ eslint : 7.12.1
 jsdoc : 3.6.6
 ```
 
-## Quick　start
+## Quick start
 ### Install
 ```
 $ git clone https://github.com/ike-keichan/JSLisp.git
