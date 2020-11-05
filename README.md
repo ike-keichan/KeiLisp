@@ -58,34 +58,19 @@ $ make test
 ```
 
 ### Example
-#### input
+#### example1
 ```
->> (+ 1 2)
-```
-
-#### output
-```
-(+ . (1 . (2 . nil)))
+>> (+ 1 2) // -> (+ . (1 . (2 . nil)))
 ```
 
-#### input
+#### example2
 ```
->> 1
-```
-
-#### output
-```
-1
+>> 1 // -> 1
 ```
 
-#### input
+#### example3
 ```
->> a
-```
-
-#### output
-```
-[String: 'a']
+>> a // -> a
 ```
 
 ---
