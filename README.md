@@ -1,5 +1,5 @@
 # JSLisp
-（修正：2020/11/6 作成:2020/11/5）
+（fix：2020/11/6 created:2020/11/5）
 
 ## Status
 Creation Period：2020.7~　
