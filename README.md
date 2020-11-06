@@ -60,39 +60,79 @@ $ make test
 ### Example
 #### example1
 ```
->> 1      // 1
+>> 1
+1
+
+>> -1.2
+-1.2
+
+>> a
+a
+
+>> nil
+nil
 ```
 
 #### example2
 ```
->> a      // a
+>> ()
+nil
+
+>> (+ 1 2)
+(+ 1 2)
+
+>> (+ 1 2.3)
+(+ 1 2.3)
+
+>> (+ 1.2 3)
+(+ 1.2 3)
+
+>> (+ 1.2 -3.4)
+(+ 1.2 -3.4)
+
+>> (+ 1.2 3)
+(+ 1.2 3)
+
+>> (+ 1 nil)
+(+ 1 NaN)     //this is Bug!!
+
+>> (+ nil 1)
+(+ nil 1)
+
+>> (+ 1.2 nil)
+(+ 1.2 NaN)   //this is Bug!!
+
+>> (+ nil 1.2)
+(+ nil 1.2)
+
 ```
 
 #### example3
 ```
->> nil    // nil
-```
+>> '(1 . 2)
+(quote (1 2))
 
-#### example4
-```
->> (+ 1 2) // (+ 1 2)
-```
+>> '(1 . 2.3)
+(quote (1 . 2.3))
 
-#### example5
-```
->> '(1 . 2) // (quote (1 2))
-```
+>> '(1.2 . 3)
+(quote (1.2 . 3))
 
-#### example6
-```
->> '(nil . 1) // (quote (nil . 1))
-```
+>> '(1.2 . 3.4)
+(quote (1.2 . 3.4))
 
-#### example6
+>> '(1 . nil)
+(quote (1 . NaN))  //this is Bug!!
+
+>> '(nil . 1)
+(quote (nil . 1))
+
+>> '(1.2 nil)
+(quote (1.2 NaN))   //this is Bug!!
+
+>> '(nil 1.2)
+(quote (nil 1.2))
 ```
->> '(1 . nil) // (quote (1 . NaN))
-```
-this is Bug!!
 
 ---
 
