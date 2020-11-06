@@ -130,6 +130,7 @@ nil
 
 >> '(1.2 nil)
 (quote (1.2))
+
 >> '(nil 1.2)
 (quote (nil 1.2))
 ```
