@@ -34,7 +34,7 @@ If the OS and Node.js versions match, the following software will be installed a
 ### Node module
 ```
 $ npm list --depth=0
-JSLisp@1.0.0 /Users/g1744069/Program/JSLisp
+JSLisp@1.0.0 ~/JSLisp
 ├── @babel/core@7.12.3
 ├── @babel/plugin-proposal-class-properties@7.12.1
 ├── @babel/preset-env@7.12.1
