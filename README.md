@@ -51,7 +51,7 @@ jsdoc : 3.6.6
 $ git clone https://github.com/ike-keichan/JSLisp.git
 ```
 
-### Setup & Launch
+### Build & Launch
 ```
 $ cd ./JSLisp
 $ make test
