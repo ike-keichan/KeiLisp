@@ -367,7 +367,7 @@ export class Parser extends Object
         this.concat();
         if(this.rightParen())
         {
-            this.tokenToInteger();
+            this.tokenToSymbol();
             return 0;
         }
 

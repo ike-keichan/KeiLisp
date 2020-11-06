@@ -65,8 +65,8 @@ export class LispInterpreter extends Object
 
            if(leftParentheses <= 0)
            {
-               aCons = this.parse(aString) 
-               for(let each of aCons.loop()){ console.log(each.toString()) }
+               aCons = this.parse(aString);
+               for(let each of aCons.loop()){ console.log(each.toString()); }
                leftParentheses = 0;
                aString = new String();
                this.rl.prompt(); // プロンプトの出力
