@@ -1,8 +1,8 @@
 # JSLisp
-（fix：2020/11/6 created:2020/11/5）
+（this document fix： 2020/11/6 create: 2020/11/5）
 
 ## Status
-Creation Period：2020.7~　
+Creation Period：2020.7~
 Version： -
 
 ## About program
