@@ -33,16 +33,17 @@ v12.18.3
 If the OS and Node.js versions match, the following software will be installed automatically when you build your environment.
 ### Node module
 ```
-webpack : 4.44.2
-webpack-cli : 3.3.12
-babel-loader : 8.1.0
-@babel/core : 7.12.3
-@babel/plugin-proposal-class-properties : 7.12.1
-@babel/preset-env : 7.12.1
-ramda : 0.27.1
-readline : 1.3.0
-eslint : 7.12.1
-jsdoc : 3.6.6
+$ npm list --depth=0
+JSLisp@1.0.0 /Users/g1744069/Program/JSLisp
+├── @babel/core@7.12.3
+├── @babel/plugin-proposal-class-properties@7.12.1
+├── @babel/preset-env@7.12.1
+├── babel-loader@8.1.0
+├── ramda@0.27.1
+├── readline@1.3.0
+├── webpack@4.44.2
+└── webpack-cli@3.3.12
+
 ```
 
 ## Quick start
