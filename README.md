@@ -30,7 +30,7 @@ $ node --version
 v12.18.3
 ```
 
-以上のバージョンが合っていれば、以下のソフトウェアは環境構築時に自動でインストールされるはずです。
+If the OS and Node.js versions match, the following software will be installed automatically when you build your environment.
 ### Node module
 ```
 webpack : 4.44.2
