@@ -95,13 +95,13 @@ nil
 (+ 1.2 3)
 
 >> (+ 1 nil)
-(+ 1 NaN)     //this is Bug!!
+(+ 1 nil)
 
 >> (+ nil 1)
 (+ nil 1)
 
 >> (+ 1.2 nil)
-(+ 1.2 NaN)   //this is Bug!!
+(+ 1.2)
 
 >> (+ nil 1.2)
 (+ nil 1.2)
@@ -123,14 +123,13 @@ nil
 (quote (1.2 . 3.4))
 
 >> '(1 . nil)
-(quote (1 . NaN))  //this is Bug!!
+(quote (1))
 
 >> '(nil . 1)
 (quote (nil . 1))
 
 >> '(1.2 nil)
-(quote (1.2 NaN))   //this is Bug!!
-
+(quote (1.2))
 >> '(nil 1.2)
 (quote (nil 1.2))
 ```
