@@ -6,9 +6,9 @@ Creation Period：2020.7~　
 Version： -
 
 ## About program
-京都産業大学コンピュータ理工学部の「コンピュータ理工学特別研究ⅡＡ・ⅡＢ」 の卒業研究で開発しているものです。
-JavaScriptを用いてLisp処理系を実装したものです。2020年11月5日現在、未完成状態です。
+I am developing it as a graduation research project of "Special Research on Computer Science and Engineering IIA/IIB" in Department of Computer Science and Engineering, Kyoto Sangyo University. 
 
+It is under development as of November 5, 2020.
 ## Execution environment
 ### OS
 ```
