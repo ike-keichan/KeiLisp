@@ -1,6 +1,6 @@
 // #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 //モジュール「Cons」を読み込む。
 import { Cons } from './Cons.js';
@@ -39,7 +39,7 @@ export class Table extends Map
         {
             let value = Cons.cloneValue(this.get(key));
             if(value != null){ aTable.set(key, value); }
-            else { console.log('RuntimeException'); } // Todo:エラー処理
+            else { throw new Error('RuntimeException!'); }
         }
 
         return aTable;

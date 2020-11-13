@@ -1,9 +1,9 @@
 // #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
-//モジュール「InterpreterSymbol」を読み込む。
-import { InterpreterSymbol } from './InterpreterSymbol';
+//モジュール「InterpretedSymbol」を読み込む。
+import { InterpretedSymbol } from './InterpretedSymbol';
 
 //モジュール「Loop」を読み込む。
 import { Loop } from './Loop';
@@ -22,7 +22,7 @@ import { Table } from './Table';
  */
 export class Cons extends Object
 {
-    static nil = new Cons();
+    static nil = new Cons(); // Todo: どうにかできたらする
 
     /**
      * コンストラクタメソッド
@@ -191,7 +191,7 @@ export class Cons extends Object
      */
     static isSymbol(anObject)
     {
-        return anObject instanceof InterpreterSymbol;
+        return anObject instanceof InterpretedSymbol;
     }
 
     /**

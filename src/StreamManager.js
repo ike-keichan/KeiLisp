@@ -1,6 +1,6 @@
 // #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 /**
  * @class
@@ -8,7 +8,7 @@
  * @author Keisuke Ikeda
  * @this {StreamManager}
  */
-export class Table extends Object
+export class StreamManager extends Object
 {
     constructor()
     {
@@ -22,28 +22,64 @@ export class Table extends Object
         return this;
     }
 
-    getStream()
+    getStream(aString)
     {
+        let aPrintStream = null;
 
+        const stream = fs.createReadStream(file);
+        const rl = require('readline').createInterface({
+            input: stream
+        });
+
+        if(this.isTrace()){ return this.traceStream(); }
+
+        try
+        {
+            let filePath = process.env.HOME;
+            filePath = aString.replaceAll('~', filePath);
+
+            if(this.streamTable.has(filePath)){ aPrintStream = this.streamTable.get(filePath); }
+            else
+            {
+                aPrintStream = rl;
+                this.streamTable.set(filePath, aPrintStream);
+            }
+        }
+        catch(e){ throw new Error("Stream is not found."); }
+
+        return aPrintStream;
     }
 
+    /**
+     * インスタンス変数を初期設定するメソッド
+     */
     initialize()
     {
-        
+        this.streamTable.set("default", process.stdout);
+        this.streamTable.set("stdout", process.stdout);
+        this.streamTable.set("stderr", process.stderr);
+
+        return null;
     }
 
     isSpy(aSymbol)
     {
         if(this.isTrace){ return true; }
-        if(this.spyTable.has(aSymbol)){ return true; }
+        if(this.spyTable().has(aSymbol)){ return true; }
         return false;
+    }
+
+    isTrace(aBoolean)
+    {
+        this.isTrace = aBoolean;
+        return null;
     }
 
     noSpy(aSymbol)
     {
-        if(this.spyTable.has(aSymbol))
+        if(this.spyTable().has(aSymbol))
         {
-            // Todo:並列処理？
+            this.spyTable().delete(aSymbol);
         }
 
         return null;
@@ -52,7 +88,7 @@ export class Table extends Object
     noTrace()
     {
         this.setIsTrace(false);
-        // Todo:並列処理？
+        this.spyTable.clear();
 
         return null;
     }
@@ -69,25 +105,46 @@ export class Table extends Object
         return null;
     }
 
-    spy()
+    spy(aSymbol, aString)
     {
+        let aPrintStream = null;
+        aPrintStream = this.getStream(aString);
+        if(aPrintStream != null)
+        {
+            this.spyTable().set(aSymbol, aString);
+        }
 
+        return null;
     }
 
-    spyStream()
+    spyStream(aSymbol)
     {
-
+        if(this.isTrace()){ return this.traceStream; }
+        if(this.spyTable().has(aSymbol))
+        {
+            return this.spyTable().get(aSymbol);
+        }
+        throw new Error("Stream is not found.");
     }
 
     spyTable()
     {
-
+        let aTable = new Map();
+        for(let [key, value] of this.spyTable){ aTable.set(key, value) }
+        return aTable;
     }
 
 
-    trace()
+    trace(aString)
     {
-        
-    }
+        let aPrintStream = null;
 
+        this.noTrace();
+        aPrintStream = this.getStream(aString);
+        if(aPrintStream == null){ aPrintStream = this.getStream("default") }
+        this.traceStream(aPrintStream);
+        this.isTrace(true);
+
+        return null;
+    }
 }

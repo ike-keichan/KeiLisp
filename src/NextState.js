@@ -1,6 +1,6 @@
 // #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 // ライブラリ「Ramda」を読み込む。
 import * as R from 'ramda'; 
@@ -33,17 +33,6 @@ export class NextState extends Object
     }
 
     /**
-     * エラーを検知し、応答するメソッド
-     * @param {String} aString エラー内容
-     * @return {Null} 何も返さない
-     */
-    fatal(aString)
-    {
-        console.log(aString); // Todo:エラー処理
-        return null;
-    }
-
-    /**
      * 
      * @param {Parser} anAutomaton 
      */
@@ -57,7 +46,7 @@ export class NextState extends Object
             {
                 this.method = this.automaton[this.methodName];
             }
-            catch(e){ this.fatal("Not Found Method: " + this.methodName); } // Todo:エラー処理
+            catch(e){ throw new Error('Not Found Method: ' + this.methodName); }
         }
 
         let aNumber = -1;
@@ -68,7 +57,7 @@ export class NextState extends Object
             let anObject = toDoMethod(this.automaton);
             if(anObject != null){ aNumber = Number(anObject); }
         }
-        catch(e) { this.fatal("Not Invoke Method: " + this.methodName); } // Todo:エラー処理
+        catch(e) { throw new Error('Not Invoke Method: ' + this.methodName); }
 
         return Number(aNumber);
     }

@@ -1,6 +1,6 @@
 // #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 import { Table } from "./Table";
 
@@ -8,12 +8,12 @@ import { Table } from "./Table";
  * @class
  * @classdesc 一意性(同一性:単射性)を有するシンボル.正準な文字列を模倣した、JSの標準シンボルとは異なるクラス。
  * @author Keisuke Ikeda
- * @this {InterpreterSymbol}
+ * @this {InterpretedSymbol}
  */
-export class InterpreterSymbol extends Object
+export class InterpretedSymbol extends Object
 {
     /**
-     * InterpreterSymbolを記憶させるテーブル
+     * InterpretedSymbolを記憶させるテーブル
      */
     static table = new Table(); // Todo: どうにかできたらする
 
@@ -21,7 +21,7 @@ export class InterpreterSymbol extends Object
      * コンストラクタメソッド
      * @constructor
      * @param {String} name
-     * @return {InterpreterSymbol} 自身
+     * @return {InterpretedSymbol} 自身
      */
     constructor(name = 'null')
     {
@@ -32,7 +32,7 @@ export class InterpreterSymbol extends Object
 
     /**
      * 印字名で自身と引数のシンボルを比較するメソッド
-     * @param {InterpreterSymbol} aSymbol 
+     * @param {InterpretedSymbol} aSymbol 
      * @return {Number} 文字列の長さの差
      */
     compareTo(aSymbol)
@@ -60,14 +60,11 @@ export class InterpreterSymbol extends Object
      */
     static of(aString)
     {
-        let aSymbol = null;
-        try { aSymbol = this.table.get(aString); }
-        catch(e){  }  // Todo:エラー処理
-        
+        let aSymbol = this.table.get(aString);       
 
         if(aSymbol == null)
         {
-            aSymbol = new InterpreterSymbol(aString);
+            aSymbol = new InterpretedSymbol(aString);
             this.table.set(aString, aSymbol);
         }
 

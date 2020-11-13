@@ -1,6 +1,9 @@
 // #!/usr/bin/env node
 
-"use strict";
+'use strict';
+
+// モジュール「Cons」を読み込む。
+import { Cons } from './Cons.js';
 
 /**
  * @class
@@ -53,7 +56,9 @@ export class Loop extends Object
      */
     next() 
     {
-        
+        let anObject = Cons.nth(this.index);
+        this.remove();
+
         return anObject;
     }
 

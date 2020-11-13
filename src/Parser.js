@@ -1,12 +1,12 @@
 // #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 // モジュール「Cons」を読み込む。
 import { Cons } from './Cons.js';
 
-//モジュール「InterpreterSymbol」を読み込む。
-import { InterpreterSymbol } from './InterpreterSymbol';
+//モジュール「InterpretedSymbol」を読み込む。
+import { InterpretedSymbol } from './InterpretedSymbol';
 
 // モジュール「IntStream」を読み込む。
 import { IntStream } from './IntStream.js';
@@ -67,18 +67,6 @@ export class Parser extends Object
     }
 
     /**
-     * エラーを検知し、応答するメソッド
-     * @param {String} aString エラー内容
-     * @return {Null} 何も返さない
-     */
-    fatal(aString)
-    {
-        console.log(aString); // Todo:エラー処理
-
-        return null;
-    }
-
-    /**
      * パースする文字列のある1文字を引数とし、パースするメソッド
      * @param {*} aCharacter パースする1文字
      * @return {Null} 何も返さない 
@@ -96,7 +84,7 @@ export class Parser extends Object
         let aNumber = new Number();
         aNumber = (String(aCharacter.charCodeAt(0))) ? inputs.get(String(aCharacter.charCodeAt(0))).next(this) : inputs.get(String(128)).next(this);
 
-        if(aNumber < 0){ this.fatal("Syntax Error!"); }　// Todo:エラー処理
+        if(aNumber < 0){ throw new Error('Syntax Error!'); }
         this.state = aNumber;
 
         return null;
@@ -118,7 +106,7 @@ export class Parser extends Object
             })()
             if(aNumber >= 0){ aCharacter = String.fromCodePoint(aNumber); }
         }
-        catch(e){ this.fatal("Read Error!"); } // Todo:エラー処理
+        catch(e){ throw new Error('Read Error!'); }
 
         // 解析する文字列を1文字ずらす。
         let count = 0;
@@ -147,7 +135,7 @@ export class Parser extends Object
         }
         if(this.atEnd())
         {
-            if(this.state != 0){ this.fatal("Syntax Error!"); }　// Todo:エラー処理
+            if(this.state != 0){ throw new Error('Syntax Error!'); }
         }
         this.tokenString = "";
 
@@ -179,7 +167,7 @@ export class Parser extends Object
      */
     peekChar(aNumber = 1)
     {
-        if(aNumber > this.nexts.length){ this.fatal("Read Error!") } // Todo:エラー処理
+        if(aNumber > this.nexts.length){ throw new Error('Read Error!'); }
         return this.nexts[aNumber];
     }
 
@@ -282,7 +270,7 @@ export class Parser extends Object
             this.state = 0;
             let cdr = this.nextToken();
             this.skippingSpaces();
-            if (this.rightParen() == false) { this.fatal("Syntax Error!"); } // Todo:エラー処理
+            if (this.rightParen() == false) { throw new Error('Syntax Error!'); }
             this.nextChar();
 
             return cdr;
@@ -301,7 +289,7 @@ export class Parser extends Object
     quote()
     {
         let anObject = new Cons(this.nextToken(), Cons.nil);
-        this.token = new Cons(InterpreterSymbol.of("quote"), anObject);
+        this.token = new Cons(InterpretedSymbol.of("quote"), anObject);
 
         return Number(0);
     }
@@ -321,7 +309,7 @@ export class Parser extends Object
 
     /**
      * NextStateによって呼び出される、右括弧(')', ']', '}')を判別し、応答するメソッド
-     * @return {Boolean}　真偽値
+     * @return {Boolean} 真偽値
      */
     rightParen()
     {
@@ -359,7 +347,7 @@ export class Parser extends Object
     }
 
     /**
-     * NextStateによって呼び出される、InterpreterSymbol型のトークン番号で応答するメソッド
+     * NextStateによって呼び出される、InterpretedSymbol型のトークン番号で応答するメソッド
      * @return {Number} トークン番号
      */
     symbolToken()
@@ -428,13 +416,13 @@ export class Parser extends Object
     }
 
     /**
-     * NextStateによって呼び出される、トークンをInterpreterSymbol型にするメソッド
+     * NextStateによって呼び出される、トークンをInterpretedSymbol型にするメソッド
      * @return {Null} 何も返さない
      */
     tokenToSymbol()
     {
-        this.token = InterpreterSymbol.of(this.tokenString);
-        if (this.token ==  InterpreterSymbol.of("nil")) { this.token = Cons.nil; }
+        this.token = InterpretedSymbol.of(this.tokenString);
+        if (this.token ==  InterpretedSymbol.of("nil")) { this.token = Cons.nil; }
         return null;
     }
 

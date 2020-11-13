@@ -5,8 +5,14 @@
 // モジュール「Cons」を読み込む。
 import { Cons } from './Cons.js';
 
-//モジュール「InterpreterSymbol」を読み込む。
-import { InterpreterSymbol } from './InterpreterSymbol';
+// モジュール「Evaluator」を読み込む。
+import { Evaluator } from './Evaluator.js';
+
+//モジュール「InterpretedSymbol」を読み込む。
+import { InterpretedSymbol } from './InterpretedSymbol';
+
+// モジュール「StreamManager」を読み込む。
+import { StreamManager } from './StreamManager.js';
 
 // モジュール「Table」を読み込む。
 import { Table } from './Table.js';
@@ -29,6 +35,9 @@ export class LispInterpreter extends Object
         super();
         // このインスタンスの環境を保持する変数
         this.root = this.initializeTable();
+        // ストリームを管理する変数
+        this.streamManager = new StreamManager();
+
         // コマンドラインの入出力を管理する変数
         this.rl = require('readline').createInterface({
             input: process.stdin,
@@ -67,6 +76,7 @@ export class LispInterpreter extends Object
            {
                aCons = this.parse(aString);
                for(let each of aCons.loop()){ console.log(each.toString()); }
+            //    for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }
                leftParentheses = 0;
                aString = new String();
                this.rl.prompt(); // プロンプトの出力
@@ -80,10 +90,54 @@ export class LispInterpreter extends Object
         return null;
     }
 
-    // eval()
-    // {
+    /**
+     * 引数のリストを評価し、評価値を応答するメソッド
+     * @param {Cons} aCons 評価するリスト
+     * @return anObject 評価値
+     */
+    eval(aCons)
+    {
+        let anObject = Cons.nil;
+        // try { anObject = Evaluator.eval(aCons, this.root, this.streamManager; }
+        // catch (e) { anObject = Cons.nil; }
 
-    // }
+        return anObject;
+    }
+
+    /**
+     * 引数の文字列をパースし、リストにして応答するメソッド
+     * @param {String} aString パースする文字列
+     * @return {Cons} パースしたリスト
+     */
+    parse(aString)
+    {
+        let aCons = null;
+
+        try { aCons = Cons.parse('(' + aString + '\n);'); }
+        catch (e)
+        {
+            console.log('*** can not parse ' + aString.replace( /\n/g , "" ) + ' ***')
+            aCons = Cons.nil;
+        }
+
+        return aCons;
+    }
+
+    /**
+	 * 指定された環境を環境の根として設定する.
+	 * @param {Table} environment
+     * @return {Null} 何も返さない。
+	 */
+    setRoot(environment)
+    {
+        if(environment instanceof Table)
+        {
+            environment.setRoot(true);
+            this.root = environment;
+        }
+
+        return null;
+    }
 
     /**
      * 環境の根を初期化するメソッド
@@ -168,7 +222,7 @@ export class LispInterpreter extends Object
         aList.push('>=');
 
         aList.forEach(each => {
-            let aSymbol = InterpreterSymbol.of(each);
+            let aSymbol = InterpretedSymbol.of(each);
             aTable.set(aSymbol, aSymbol)
         });
 
@@ -177,70 +231,30 @@ export class LispInterpreter extends Object
         aString = "(lambda (list1 list2) (cond ((atom? list1) nil) ((atom? list2) nil) ((null? list1) list2) (t (cons (car list1) (append (cdr list1) list2)))))";
         aCons = Cons.parse(aString);
         aCons.last().setCdr(new Cons(aTable, Cons.nil));
-        aTable.set(InterpreterSymbol.of('append'), aCons);
+        aTable.set(InterpretedSymbol.of('append'), aCons);
 
         aString = "(lambda (l n) (cond ((<= (length l) n) nil) (t (cons (car l) (butlast (cdr l) n)))))";
         aCons = Cons.parse(aString);
         aCons.last().setCdr(new Cons(aTable, Cons.nil));
-		aTable.set(InterpreterSymbol.of('butlast'), aCons);
+		aTable.set(InterpretedSymbol.of('butlast'), aCons);
 
 		aString = "(lambda (l) (cond ((atom? l) nil) ((null? l) 0)	(t (+ 1 (length (cdr l))))))";
         aCons = Cons.parse(aString);
         aCons.last().setCdr(new Cons(aTable, Cons.nil));
-		aTable.set(InterpreterSymbol.of('length'), aCons);
+		aTable.set(InterpretedSymbol.of('length'), aCons);
 
 		aString = "(lambda (n l) (cond ((> n (length l)) nil) ((= 0 n) l) (t (nthcdr (- n 1) (cdr l)))))";
         aCons = Cons.parse(aString);
         aCons.last().setCdr(new Cons(aTable, Cons.nil));
-		aTable.set(InterpreterSymbol.of('nthcdr'), aCons);
+		aTable.set(InterpretedSymbol.of('nthcdr'), aCons);
 
 		aString = "(lambda (l) (cond ((atom? l) l) ((null? l) '()) (t (append (reverse (cdr l)) (list (car l))))))";
         aCons = Cons.parse(aString);
         aCons.last().setCdr(new Cons(aTable, Cons.nil));
-        aTable.set(InterpreterSymbol.of('reverse'), aCons);
+        aTable.set(InterpretedSymbol.of('reverse'), aCons);
         
-        aTable.set(InterpreterSymbol.of('t'), InterpreterSymbol.of('t'));
+        aTable.set(InterpretedSymbol.of('t'), InterpretedSymbol.of('t'));
 
         return aTable;
     }
-
-    /**
-     * 引数の文字列を解析し、リストにして応答するメソッド
-     * @param {String} input 解析を行う文字列
-     * @return {Cons} 解析を終えたリスト
-     */
-    parse(input)
-    {
-        let aCons = null;
-
-        try { aCons = Cons.parse('(' + input + '\n);'); }
-        catch (e)
-        {
-            console.log('*** can not parse ' + input.replace( /\n/g , "" ) + ' ***')
-            aCons = Cons.nil;
-        }
-
-        return aCons;
-    }
-
-    /**
-	 * 指定された環境を環境の根として設定する.
-	 * @param {Table} environment
-     * @return {Null} 何も返さない。
-	 */
-    setRoot(environment)
-    {
-        if(environment instanceof Table)
-        {
-            environment.setRoot(true);
-            this.root = environment;
-        }
-
-        return null;
-    }
-
-    // streamManager()
-    // {
-
-    // }
 }
