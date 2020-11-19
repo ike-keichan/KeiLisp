@@ -257,7 +257,7 @@ export class Cons extends Object
      */
     nconc(aCons)
     {
-        this.last().cdr(aCons);
+        this.last().setCdr(aCons);
         return this;
     }
 

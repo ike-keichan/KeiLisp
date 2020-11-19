@@ -10,6 +10,10 @@
  */
 export class StreamManager extends Object
 {
+    /**
+     * コンストラクタメソッド
+     * @return {StreamManager} 自身
+     */
     constructor()
     {
         super();
@@ -65,7 +69,7 @@ export class StreamManager extends Object
     isSpy(aSymbol)
     {
         if(this.isTrace){ return true; }
-        if(this.spyTable().has(aSymbol)){ return true; }
+        if(this.spyTable_().has(aSymbol)){ return true; }
         return false;
     }
 
@@ -77,9 +81,9 @@ export class StreamManager extends Object
 
     noSpy(aSymbol)
     {
-        if(this.spyTable().has(aSymbol))
+        if(this.spyTable_().has(aSymbol))
         {
-            this.spyTable().delete(aSymbol);
+            this.spyTable_().delete(aSymbol);
         }
 
         return null;
@@ -111,7 +115,7 @@ export class StreamManager extends Object
         aPrintStream = this.getStream(aString);
         if(aPrintStream != null)
         {
-            this.spyTable().set(aSymbol, aString);
+            this.spyTable_().set(aSymbol, aString);
         }
 
         return null;
@@ -120,14 +124,14 @@ export class StreamManager extends Object
     spyStream(aSymbol)
     {
         if(this.isTrace()){ return this.traceStream; }
-        if(this.spyTable().has(aSymbol))
+        if(this.spyTable_().has(aSymbol))
         {
-            return this.spyTable().get(aSymbol);
+            return this.spyTable_().get(aSymbol);
         }
         throw new Error("Stream is not found.");
     }
 
-    spyTable()
+    spyTable_()
     {
         let aTable = new Map();
         for(let [key, value] of this.spyTable){ aTable.set(key, value) }

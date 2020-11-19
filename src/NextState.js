@@ -42,10 +42,7 @@ export class NextState extends Object
         if(this.methodName == null){ return Number(this.nextState); }
         if(this.method == null)
         {
-            try
-            {
-                this.method = this.automaton[this.methodName];
-            }
+            try { this.method = this.automaton[this.methodName]; }
             catch(e){ throw new Error('Not Found Method: ' + this.methodName); }
         }
 
@@ -53,8 +50,7 @@ export class NextState extends Object
         try
         {
             if(this.nextState != null){ aNumber = this.nextState; }
-            let toDoMethod = R.invoker(0, this.methodName);
-            let anObject = toDoMethod(this.automaton);
+            let anObject = R.invoker(0, this.methodName)(this.automaton);
             if(anObject != null){ aNumber = Number(anObject); }
         }
         catch(e) { throw new Error('Not Invoke Method: ' + this.methodName); }

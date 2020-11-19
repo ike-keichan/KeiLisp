@@ -75,8 +75,8 @@ export class LispInterpreter extends Object
            if(leftParentheses <= 0)
            {
                aCons = this.parse(aString);
-               for(let each of aCons.loop()){ console.log(each.toString()); }
-            //    for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }
+            //    for(let each of aCons.loop()){ console.log(each.toString()); }
+               for(let each of aCons.loop()){ console.log(this.eval(each)); }
                leftParentheses = 0;
                aString = new String();
                this.rl.prompt(); // プロンプトの出力
@@ -93,13 +93,15 @@ export class LispInterpreter extends Object
     /**
      * 引数のリストを評価し、評価値を応答するメソッド
      * @param {Cons} aCons 評価するリスト
-     * @return anObject 評価値
+     * @return {Object} 評価値
      */
     eval(aCons)
     {
         let anObject = Cons.nil;
-        // try { anObject = Evaluator.eval(aCons, this.root, this.streamManager; }
+        // try { anObject = Evaluator.eval(aCons, this.root, this.streamManager); }
         // catch (e) { anObject = Cons.nil; }
+
+        anObject = Evaluator.eval(aCons, this.root, this.streamManager);
 
         return anObject;
     }
@@ -140,8 +142,8 @@ export class LispInterpreter extends Object
     }
 
     /**
-     * 環境の根を初期化するメソッド
-     * @return {Table} 初期化した環境の根
+     * 環境のテーブルを初期化するメソッド
+     * @return {Table} 初期化した環境のテーブル
      */
     initializeTable()
     {
