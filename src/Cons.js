@@ -63,7 +63,7 @@ export class Cons extends Object
     /**
      * 引数の値(Consの要素)を複製し、応答するメソッド
      * @param {*} value Consの要素
-     * @return {*} value 複製したConsの要素
+     * @return {*} 複製したConsの要素
      */
     static cloneValue(value)
     {
@@ -141,7 +141,7 @@ export class Cons extends Object
      */
     static isNil(anObject)
     {
-        return Object.is(anObject, Cons.nil);
+        return anObject == Cons.nil;
     }
 
     /**

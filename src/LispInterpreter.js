@@ -76,7 +76,7 @@ export class LispInterpreter extends Object
            {
                aCons = this.parse(aString);
             //    for(let each of aCons.loop()){ console.log(each.toString()); }
-               for(let each of aCons.loop()){ console.log(this.eval(each)); }
+               for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }
                leftParentheses = 0;
                aString = new String();
                this.rl.prompt(); // プロンプトの出力

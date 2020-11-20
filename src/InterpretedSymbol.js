@@ -26,7 +26,7 @@ export class InterpretedSymbol extends Object
     constructor(name = 'null')
     {
         super();
-        this.name = new String(name);
+        this.name = name;
         return this;
     }
 
@@ -77,6 +77,6 @@ export class InterpretedSymbol extends Object
      */
     toString()
     {
-        return this.name
+        return this.name;
     }
 }

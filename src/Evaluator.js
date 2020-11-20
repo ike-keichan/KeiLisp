@@ -221,6 +221,10 @@ export class Evaluator extends Object
 
     }
 
+    /**
+	 * 深さ分のインデント文字列を応答するメソッド
+	 * @return {String} インデント文字列
+	 */
     indent()
     {
         let index = 0;
@@ -228,8 +232,7 @@ export class Evaluator extends Object
         aString += "";
         while(index++ < this.depth){ aString += "| "; }
 
-        return aString;
-        
+        return aString; 
     }
 
     isSpy(aSymbol)
@@ -288,6 +291,11 @@ export class Evaluator extends Object
 
     }
 
+    /**
+     * 
+     * @param {Cons} aCons 
+     * @return {Cons} 
+     */
     quote(aCons)
     {
         return aCons.car;
