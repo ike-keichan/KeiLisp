@@ -29,7 +29,7 @@ import { Table } from './Table.js';
 export class Evaluator extends Object
 {
     /**
-     * 
+     * Lispの関数とJSの関数を紐づけるテーブル
      */
     static buildInFunctions = Evaluator.setup();
 
@@ -51,59 +51,243 @@ export class Evaluator extends Object
         return this;
     }
 
-    and()
+    /**
+     * 引数を評価し、その論理積を応答するメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    and(aCons)
     {
+        for(let each of aCons.loop())
+        {
+            let anObject = Evaluator.eval(each, this.environment, this.streamManager, this.depth);
+            if(Cons.isNil(anObject)){ return Cons.nil; }
+        }
 
+        return InterpretedSymbol.of('t');
     }
 
-    apply_lisp()
+    /**
+     * 第2引数のリストに対して、第1引数の関数で評価し、応答するメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    apply_lisp(aCons)
     {
+        let procedure = Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
+        let args = Evaluator.eval(aCons.nth(2), this.environment, this.streamManager, this.depth);
+        let aTable = this.environment;
+        if(procedure instanceof Cons && procedure.last().car instanceof Table){ aTable = procedure.last().car; }
 
+        return Applier.apply(procedure, args, aTable, this.streamManager, this.depth);
     }
 
-    bind()
+    /**
+     * インタプリテッドシンボルが何重に束縛されているか応答するメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    bind(aCons)
     {
+        if(Cons.isNotSymbol(aCons.car)){ console.log('Can not apply \"bind\" to \"' + aCons.car + '\"'); return Cons.nil;}
+        let aSymbol = aCons.car;
+        if(!this.environment.has(aSymbol)){ return Cons.nil; }
 
+        return this.bindAUX(aSymbol);
     }
 
-    bindAUX()
+    /**
+     * bindの補助メソッド
+     * @param {InterpretedSymbol} aSymbol 対象のシンボル
+     * @return {Number} 束縛されている数
+     */
+    bindAUX(aSymbol)
     {
+        let aTable = this.environment;
+        let anObject = aTable.get(aSymbol);
+        let count = 1;
 
+        while(aTable != null)
+        {
+            if(!aTable.has(aSymbol)){ break; }
+            let theObject = aTable.get(aSymbol);
+            if(theObject != anObject)
+            {
+                count++;
+                anObject = theObject;
+            }
+            aTable = aTable.source;
+        }
+
+        return count;
     }
 
-    binding()
+    /**
+     * 指定された環境に、パラメータを逐次評価し設定する、let*とdo*の補助メソッド
+     * @param {Cons} parameters 評価するCons
+     * @param {Table} aTable 指定した環境
+     * @param {Null} 何も返さない。
+     */
+    binding(parameters, aTable)
     {
+        for(let each of parameters.loop())
+        {
+            let theCons = each;
+            let key = null;
+            if(Cons.isSymbol(theCons.car)){ key = theCons.car; }
+            else{ console.log('\"' + theCons.car + '\" is not symbol'); }
+            let value = Evaluator.eval(theCons.nth(2), aTable, this.streamManager, this.depth);
+            aTable.set(key, value);
+        }
 
+        return null;
     }
 
-    bindingParallel()
+    /**
+     * 指定された環境に、パラメータを並列評価し設定する、letとdoの補助メソッド
+     * @param {Cons} parameters 評価するCons
+     * @param {Table} aTable 指定した環境
+     * @param {Null} 何も返さない。
+     */
+    bindingParallel(parameters, aTable)
     {
+        let theTable = new Map();
+        for(let each of parameters.loop())
+        {
+            let theCons = each;
+            let key = null;
+            if(Cons.isSymbol(theCons.car)){ key = theCons.car; }
+            else{ console.log('\"' + theCons.car + '\" is not symbol'); }
+            let value = Evaluator.eval(theCons.nth(2), aTable, this.streamManager, this.depth);
+            theTable.set(key, value);
+        }
 
+        for(let [key, value] of theTable){ aTable.set(key, value); }
+
+        return null;
     }
 
-    cond()
+    /**
+     * 最初の式の結果によって、処理を振り分け、式を評価していくメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    cond(aCons)
     {
-
+        if(Cons.isNil(aCons)){ return Cons.nil; }
+        let clause = aCons.car;
+        let anObject = Evaluator.eval(clause.car, this.environment, this.streamManager, this.depth);
+        if(Cons.isNil(anObject)){ return this.cond(aCons.cdr); }
+        else
+        {
+            let consequent = clause.cdr;
+            for(let each of consequent.loop()){ anObject = Evaluator.eval(each, this.environment, this.streamManager, this.depth); }
+            return anObject;
+        }
     }
 
-    defun()
+    /**
+     * 第1引数を関数名、第2引数を関数の引数、第3引数を式とする関数を定義するメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    defun(aCons)
     {
+        let variable = aCons.car;
+        let lambda = aCons.cdr;
+        if(aCons.length() == 2){ lambda = lambda.car; }
+        else { lambda = new Cons(InterpretedSymbol.of("lambda"), lambda); }
+        lambda = Evaluator.eval(lambda, new Table(this.environment), this.streamManager, this.depth);
+        this.environment.set(variable, lambda);
 
+        return variable;
     }
 
-    do_()
+    /**
+     * 条件が成立するまで繰り返し引数の評価を並列に行うメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    do_(aCons)
     {
+        let parameters = aCons.car;
+        let bool = aCons.nth(2);
+        let expressions = aCons.cdr.cdr;
+        this.bindingParallel(parameters, this.environment);
+        if(Cons.isNil(bool)){ bool.setCar(Cons.nil); }
 
+        while(true)
+        {
+            let theTable = new Map();
+            let value;
+            if(Cons.isNotNil(Evaluator.eval(bool.car, this.environment, this.streamManager, this.depth))){ break; }
+            for(let each of expressions.loop()){ Evaluator.eval(each, this.environment, this.streamManager, this.depth); }
+            for(let each of parameters.loop())
+            {
+                let theCons = each;
+                if(Cons.isNotSymbol(theCons.car)){ console.log('\"' + theCons.car + '\" is not symbol'); }
+                let key = theCons.car;
+                if(Cons.isNotNil(theCons.nth(3)))
+                {
+                    value = Evaluator.eval(theCons.nth(3), this.environment, this.streamManager, this.depth);
+                    theTable.set(key, value);
+                }
+            }
+            for(let [key, value] of theTable){ this.environment.set(key, value); }
+        }
+        return Evaluator.eval(bool.nth(2), this.environment, this.streamManager, this.depth);
     }
 
-    doList()
+    /**
+     * リストの各要素に対して繰り返し引数の評価を順番に行うメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    doList(aCons)
     {
+        let parameter = aCons.car;
+        let theCons = aCons.cdr;
+        let args = Evaluator.eval(parameter.nth(2), this.environment, this.streamManager, this.depth);
+        for(let element of args.loop())
+        {
+            this.environment.set(parameter.car, element);
+            for(let each of theCons.loop()){ Evaluator.eval(each, this.environment, this.streamManager, this.depth); }
+        }
 
+        return Evaluator.eval(parameter.nth(3), this.environment, this.streamManager, this.depth);
     }
 
-    doStar()
+    /**
+     * 条件が成立するまで繰り返し引数の評価を順番に行うメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    doStar(aCons)
     {
+        let parameters = aCons.car;
+        let bool = aCons.nth(2);
+        let expressions = aCons.cdr.cdr;
+        this.binding(parameters, this.environment);
+        if(Cons.isNil(bool)){ bool.setCar(Cons.nil); }
 
+        while(true)
+        {
+            if(Cons.isNotNil(Evaluator.eval(bool.car, this.environment, this.streamManager, this.depth))){ break; }
+            for(let each of expressions.loop()){ Evaluator.eval(each, this.environment, this.streamManager, this.depth); }
+            for(let each of parameters.loop())
+            {
+                let theCons = each;
+                if(Cons.isNotSymbol(theCons.car)){ console.log('\"' + theCons.car + '\" is not symbol'); }
+                let key = theCons.car;
+                let value;
+                if(Cons.isNotNil(theCons.nth(3)))
+                {
+                    value = Evaluator.eval(theCons.nth(3), this.environment, this.streamManager, this.depth);
+                    this.environment.set(key, value);
+                }
+            }
+        }
+        return Evaluator.eval(bool.nth(2), this.environment, this.streamManager, this.depth);
     }
 
     /**
@@ -114,25 +298,23 @@ export class Evaluator extends Object
     entrustApplier(form)
     {
         let aCons = form.cdr;
-        let args = new Cons();
+        let args = new Cons(Cons.nil, Cons.nil);
         let procedure = form.car;
-        let aSymbol = new InterpretedSymbol();
+        let aSymbol = null;
 
-        // console.log('entrustApplier111');
         if(Cons.isSymbol(procedure)){ aSymbol = procedure; }
         if(this.isSpy(aSymbol))
         {
-            this.spyPrint(this.streamManager.spyStream(aSymbol), form.toString);
+            this.spyPrint(this.streamManager.spyStream(aSymbol), form.toString());
             this.setDepth(this.depth + 1);
         }
-        // console.log('entrustApplier222');
+
         for(let each of aCons.loop())
         {
             if(each instanceof Table){ break; }
             args.add(Evaluator.eval(each, this.environment, this.streamManager, this.depth));
         }
         if(this.isSpy(aSymbol)){ this.setDepth(this.depth - 1); }
-        // console.log('entrustApplier333');
 
         args = args.cdr;
         let anObject = Applier.apply(procedure, args, this.environment, this.streamManager, this.depth);
@@ -159,13 +341,9 @@ export class Evaluator extends Object
      */
     eval(form)
     {
-        // console.log('eval111');
         if(Cons.isSymbol(form)){ return this.evaluateSymbol(form); }
-        // console.log('eval222');
         if(Cons.isNil(form) || Cons.isAtom(form)){ return form; }
-        // console.log('eval333');
         if(Cons.isSymbol(form.car) &&  Evaluator.buildInFunctions.has(form.car)){ return this.specialForm(form); }
-        // console.log('eval444');
 
         return this.entrustApplier(form);
     }
@@ -173,7 +351,7 @@ export class Evaluator extends Object
     /**
      * Evaluatorを実行するメソッド
      * @param {Cons} aCons 評価するCons
-     * @return {*} 計算結果
+     * @return {*} 評価結果
      */
     eval_lisp(aCons)
     {
@@ -181,15 +359,14 @@ export class Evaluator extends Object
     }
 
     /**
-     * シンボルを評価して応答するメソッド
-     * @param {InterpretedSymbol} aSymbol シンボル
-     * @return {InterpretedSymbol} 評価したシンボル
+     * インタプリテッドインタプリテッドシンボルを評価して応答するメソッド
+     * @param {InterpretedSymbol} aSymbol インタプリテッドシンボル
+     * @return {InterpretedSymbol} 評価したインタプリテッドシンボル
      */
     evaluateSymbol(aSymbol)
     {
-        let answer = null;
-
-        if(aSymbol != null & this.environment.has(aSymbol))
+        let answer = Cons.nil;
+        if(aSymbol != null && this.environment.has(aSymbol))
         {
             if(this.isSpy(aSymbol))
             {
@@ -206,19 +383,46 @@ export class Evaluator extends Object
                 this.spyPrint(this.streamManager.spyStream(aSymbol), answer + ' <== ' + aSymbol);
             }
         }
-        else{ throw new Error("I could find no variable binding for " + aSymbol); }
+        else{ console.log("I could find no variable binding for " + aSymbol); }
 
         return answer;
     }
 
-    exit()
+    /**
+     * 処理系を終了するメソッド
+     * @param {*} args 引数
+     */
+    exit(args = null)
     {
-
+        console.log('Bye!');
+        process.exit(0);
     }
 
-    if_()
+    /**
+     * ガベージコレクタを実行するメソッド
+     * @param {*} args 引数
+     * @return {InterpretedSymbol} インタプリテッドシンボルt
+     */
+    gc(args = null)
     {
+        const gc = require('expose-gc/function');
+        gc();
+        return InterpretedSymbol.of('t');
+    }
 
+    /**
+     * 最初の式が成り立つ時、後ろの式を評価していくメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    if_(aCons)
+    {
+        let anObject = Cons.nil;
+        let bool = Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
+        if(Cons.isNil(bool)){ anObject = aCons.nth(3); }
+        else{ anObject = aCons.nth(2); }
+
+        return Evaluator.eval(anObject, this.environment, this.streamManager, this.depth);
     }
 
     /**
@@ -235,100 +439,247 @@ export class Evaluator extends Object
         return aString; 
     }
 
+    /**
+     * スパイする必要があるかどうかを判別し、応答するメソッド
+     * @param {InterpretedSymbol} aSymbol
+     * @return {Boolean} 真偽値
+     */
     isSpy(aSymbol)
     {
         if(aSymbol == null){ return false; }
         return this.streamManager.isSpy(aSymbol);
     }
 
-    lambda()
+    /**
+     * 第1引数をラムダ式の引数、第2引数を式とするラムダ式を生成するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    lambda(args)
     {
+        let aCons = Cons.cloneValue(args)
+        let theCons = aCons.cdr;
+        theCons.setCdr(new Cons(this.environment, Cons.nil));
 
-    }
-
-    let()
-    {
-
-    }
-
-    letStar()
-    {
-
-    }
-
-    noSpy()
-    {
-
-    }
-
-    not()
-    {
-
-    }
-
-    noTrace()
-    {
-
-    }
-
-    or()
-    {
-
-    }
-
-    pop_()
-    {
-
-    }
-
-    progn()
-    {
-
-    }
-
-    push_()
-    {
-
+        return new Cons(InterpretedSymbol.of('lambda'), aCons);
     }
 
     /**
-     * 
-     * @param {Cons} aCons 
-     * @return {Cons} 
+     * 明示的に新しい環境を構築するメソッド
+     * 引数の評価は順番に行う。
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    let(aCons)
+    {
+        let aTable = new Table(this.environment);
+        let parameters = aCons.car;
+        let forms = aCons.cdr;
+        let anObject = Cons.nil;
+        this.bindingParallel(parameters, aTable);
+        for(let each of forms.loop()){ anObject = Evaluator.eval(each, aTable, this.streamManager, this.depth) }
+
+        return anObject;
+    }
+
+    /**
+     * 明示的に新しい環境を構築するメソッド
+     * 引数の評価は並列に行う。
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    letStar(aCons)
+    {
+        let aTable = new Table(this.environment);
+        let parameters = aCons.car;
+        let forms = aCons.cdr;
+        let anObject = Cons.nil;
+        this.binding(parameters, aTable);
+        for(let each of forms.loop()){ anObject = Evaluator.eval(each, aTable, this.streamManager, this.depth) }
+
+        return anObject;
+    }
+
+    /**
+     * 引数を評価し、その論理否定を応答するメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    not(aCons)
+    {
+        if (Cons.isNil(Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth))){ return InterpretedSymbol.of('t'); }
+        return Cons.nil;
+    }
+
+    // Todo:実装不十分
+    /**
+     * トレースしないように設定するメソッド
+     * @param {*} args 引数
+     * @return {InterpretedSymbol} インタプリテッドシンボルt
+     */
+    notrace(args = null)
+    {
+        this.streamManager.noTrace();
+		return InterpretedSymbol.of("t");
+    }
+
+    /**
+     * 引数を評価し、その論理和を応答するメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    or(aCons)
+    {
+        for(let each of aCons.loop())
+        {
+            let anObject = Evaluator.eval(each, this.environment, this.streamManager, this.depth);
+            if(Cons.isNotNil(anObject)){ return InterpretedSymbol.of('t'); }
+        }
+
+        return Cons.nil;
+    }
+
+    /**
+     * 第1引数のインタプリテッドシンボルに束縛されたリストから先頭の要素を取り出し、応答するメソッド
+     * @param {*} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    pop_(aCons)
+    {
+        if(Cons.isNotSymbol(aCons.car)){ console.log('arguments 1 is not symbol.'); }
+        let aSymbol = aCons.car;
+        let anObject = Evaluator.eval(aSymbol, this.environment, this.streamManager, this.depth);
+        if(Cons.isNotCons(anObject)){ return Cons.nil; }
+        this.environment.setIfExit(aSymbol, anObject.cdr);
+
+        return anObject.car;
+    }
+
+    /**
+     * 式を順番に評価していくメソッド
+     * @param {*} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    progn(aCons)
+    {
+        let anObject = Cons.nil;
+        let theCons = aCons.car;
+        this.bindingParallel(theCons, this.environment);
+        theCons = aCons.cdr;
+        for(let each of theCons.loop()){ anObject = Evaluator.eval(each, this.environment, this.streamManager, this.depth); }
+
+        return anObject;
+    }
+
+    /**
+     * 第2引数のインタプリテッドシンボルに束縛されたシンボルに対して、第1引数の値をリストの先頭に登録し、応答するメソッド
+     * @param {*} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    push_(aCons)
+    {
+        let anObject = Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
+        if(Cons.isNotSymbol(aCons.nth(2))){ console.log('arguments 2 is not symbol.'); }
+        let aSymbol = aCons.nth(2);
+        anObject = new Cons(anObject, Evaluator.eval(aSymbol, this.environment, this.streamManager, this.depth));
+        this.environment.setIfExit(aSymbol, anObject);
+
+        return anObject;
+    }
+
+    /**
+     * 参照を応答するメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
      */
     quote(aCons)
     {
         return aCons.car;
     }
 
-    set_()
+    /**
+     * 現環境にのみにキーと値を束縛するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    set_(args)
     {
+        let anObject = Cons.nil;
+        let anIterator = args.loop();
+        let index = -1;
 
+        while(anIterator.hasNext())
+        {
+            let key = null;
+
+            if(Cons.isSymbol(args.nth(index + 2))){ key = anIterator.next(); }
+            else{ console.log('\"' + args.car + '\" is not symbol'); }
+
+            if(!anIterator.hasNext()){ console.log('sizes do not match.'); }
+            anObject = Evaluator.eval(anIterator.next(), this.environment, this.streamManager, this.depth);
+            this.environment.set(key, anObject);
+        }
+
+        return anObject;
     }
 
-    set_all_()
+    /**
+     * 環境全てにキーと値を束縛するメソッド
+     * キーと値を上書きする’
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    set_all_(args)
     {
+        let anObject = Cons.nil;
+        let anIterator = args.loop();
+        let index = -1;
 
+        console.log(args.toString());
+
+        while(anIterator.hasNext())
+        {
+            let key = null;
+
+            if(Cons.isSymbol(args.nth(index + 2))){ key = anIterator.next(); }
+            else{ console.log('\"' + args.car + '\" is not symbol'); }
+            anObject = Evaluator.eval(anIterator.next(), this.environment, this.streamManager, this.depth);
+            this.environment.setIfExit(key, anObject);
+        }
+
+        return anObject;
     }
 
-    set_car_()
+    /**
+     * 第２引数で指定されたリストの先頭の要素に第1引数で指定した値を設定し、応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    set_car_(args)
     {
+        let anObject = Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
+        if(Cons.isNotCons(anObject)){ console.log('Can not apply \"set-car!\" to \"' + anObject + '\"'); return Cons.nil; }
+        let aCons = anObject;
+        anObject = Evaluator.eval(args.nth(2), this.environment, this.streamManager, this.depth);
+        aCons.setCar(anObject);
 
+        return Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
     }
 
-    set_car_all_()
+    /**
+     * 第２引数で指定されたリストの先頭以外の要素に第1引数で指定した値を設定し、応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    set_cdr_(args)
     {
+        let anObject = Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
+        if(Cons.isNotCons(anObject)){ console.log('Can not apply \"set-cdr!\" to \"' + anObject + '\"'); return Cons.nil; }
+        let aCons = anObject;
+        anObject = Evaluator.eval(args.nth(2), this.environment, this.streamManager, this.depth);
+        aCons.setCdr(anObject);
 
-    }
-
-    set_cdr_()
-    {
-        
-    }
-
-    set_cdr_all_()
-    {
-
+        return Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
     }
 
     /**
@@ -351,10 +702,10 @@ export class Evaluator extends Object
         try
         {
             let aTable = new Map();
-            aTable.set(InterpretedSymbol.of("and"), "and");
+            aTable.set(InterpretedSymbol.of("and"), "and"); //OK?
 			aTable.set(InterpretedSymbol.of("apply"), "apply_lisp");
 			aTable.set(InterpretedSymbol.of("bind"), "bind");
-			aTable.set(InterpretedSymbol.of("cond"), "cond");
+			aTable.set(InterpretedSymbol.of("cond"), "cond"); //OK?
 			aTable.set(InterpretedSymbol.of("defun"), "defun");
 			aTable.set(InterpretedSymbol.of("do"), "do_");
 			aTable.set(InterpretedSymbol.of("dolist"), "doList");
@@ -366,10 +717,10 @@ export class Evaluator extends Object
             aTable.set(InterpretedSymbol.of("lambda"), "lambda");
 			aTable.set(InterpretedSymbol.of("let"), "let");
 			aTable.set(InterpretedSymbol.of("let*"), "letStar");
-			aTable.set(InterpretedSymbol.of("nospy"), "nospy");
-			aTable.set(InterpretedSymbol.of("not"), "not");
+			// aTable.set(InterpretedSymbol.of("nospy"), "nospy");
+			aTable.set(InterpretedSymbol.of("not"), "not"); //OK?
 			aTable.set(InterpretedSymbol.of("notrace"), "notrace");
-			aTable.set(InterpretedSymbol.of("or"), "or");
+			aTable.set(InterpretedSymbol.of("or"), "or"); //OK?
 			aTable.set(InterpretedSymbol.of("pop!"), "pop_");
 			aTable.set(InterpretedSymbol.of("progn"), "progn");
 			aTable.set(InterpretedSymbol.of("push!"), "push_");
@@ -377,85 +728,119 @@ export class Evaluator extends Object
 			aTable.set(InterpretedSymbol.of("set!"), "set_");
 			aTable.set(InterpretedSymbol.of("set-all!"), "set_all_");
 			aTable.set(InterpretedSymbol.of("set-car!"), "set_car_");
-			aTable.set(InterpretedSymbol.of("set-car-all!"), "set_car_all_");
 			aTable.set(InterpretedSymbol.of("set-cdr!"), "set_cdr_");
-			aTable.set(InterpretedSymbol.of("set-cdr-all!"), "set_cdr_all_");
-			aTable.set(InterpretedSymbol.of("spy"), "spy");
+			// aTable.set(InterpretedSymbol.of("spy"), "spy");
 			aTable.set(InterpretedSymbol.of("time"), "time");
 			aTable.set(InterpretedSymbol.of("trace"), "trace");
-			aTable.set(InterpretedSymbol.of("unless"), "unless");
-            aTable.set(InterpretedSymbol.of("when"), "when");
+			aTable.set(InterpretedSymbol.of("unless"), "unless"); //OK?
+            aTable.set(InterpretedSymbol.of("when"), "when"); //OK?
             
             return aTable;
         }
         catch(e){ throw new Error('NullPointerException (Evaluator, initialize)'); }
     }
 
+    /**
+     * スペシャルフォームを評価するメソッド
+     * @param {Cons} form スペシャルフォーム
+     * @return {*} 評価結果
+     * 
+     */
     specialForm(form)
     {
-        let answer = null;
+        let aSymbol = form.car;
 
-        try
+        if(this.isSpy(aSymbol))
         {
-            let aSymbol = form.car;
-
-            if(this.isSpy(aSymbol))
-            {
-                this.spyPrint(this.streamManager.spyStream(aSymbol), form.toString());
-                this.setDepth(this.depth + 1);
-            }
-        
-            let aCons = form.cdr;
-            let methodName = Evaluator.buildInFunctions.get(aSymbol);
-
-            try { let method = this[methodName]; }
-            catch(e){ throw new Error('Not Found Method: ' + methodName); }
-
-            try { answer = R.invoker(1, methodName)(aCons, this); }
-            catch(e) { throw new Error('Not Invoke Method: ' + this.methodName); }
-
-            if(this.isSpy(aSymbol))
-            {
-                this.setDepth(this.depth - 1);
-                this.spyPrint(this.streamManager.spyStream(aSymbol), answer + ' <== ' + aSymbol);
-            }
+            this.spyPrint(this.streamManager.spyStream(aSymbol), form.toString());
+            this.setDepth(this.depth + 1);
         }
-        catch(e){ throw new Error('IllegalAccessException (Evaluator, specialForm)'); }
+    
+        let aCons = form.cdr;
+        let methodName = Evaluator.buildInFunctions.get(aSymbol);
+
+        try { let method = this[methodName]; }
+        catch(e){ throw new Error('Not Found Method: ' + methodName); }
+
+        let answer = R.invoker(1, methodName)(aCons, this);
+
+        if(this.isSpy(aSymbol))
+        {
+            this.setDepth(this.depth - 1);
+            this.spyPrint(this.streamManager.spyStream(aSymbol), answer + ' <== ' + aSymbol);
+        }
         
         return answer;
-    }
-
-    spy()
-    {
-
     }
     
     spyPrint(aStream, line)
     {
-        aPrintStream = process.stdout;
-        if(aStream != null){  }
+        let aPrintStream = process.stdout;
+        if(aStream != null){ /* Todo: 未実装 */ console.log(aStream); }
         console.log(this.indent() + line);
-        if(aStream != null){  }
+        if(aStream != null){ /* Todo: 未実装 */ console.log(aPrintStream); }
         return null;
     }
 
-    time()
+    /**
+     * 引数で与えられた式を評価するのにかかった時間（ms）を応答するメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {Number} 評価にかかった時間（ms）
+     */
+    time(aCons)
     {
+        const start = process.hrtime()
+        Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
+        const end = process.hrtime(start);
+
+        return end[1] / 1000000;
 
     }
 
-    trace()
+    // Todo:実装不十分
+    /**
+     * トレースするように設定するメソッド
+     * @param {Cons} aCons トレースするCons
+     * @return {InterpretedSymbol} インタプリテッドシンボルt
+     */
+    trace(aCons)
     {
-
-    }
-
-    unless()
-    {
-
-    }
-
-    when()
-    {
+        let anObject = aCons.car;
+        if(Cons.isNil(anObject) || anObject == null){ anObject = 'default'; }
+        this.streamManager.trace(new String(anObject));
         
+        return InterpretedSymbol.of('t');
+    }
+
+    /**
+     * 最初の式が成り立たない時、後ろの式を順次評価していくメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    unless(aCons)
+    {
+        let anObject = Cons.nil;
+        let theCons = aCons.cdr;
+        let flag = Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
+        if(Cons.isNotNil(flag)){ return Cons.nil; }
+        for(let each of theCons.loop()){ anObject = Evaluator.eval(each, this.environment, this.streamManager, this.depth); }
+        
+        return anObject;
+    }
+
+    /**
+     * 最初の式が成り立つ時、後ろの式を順次評価していくメソッド
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    when(aCons)
+    {
+        let anObject = Cons.nil;
+        let theCons = aCons.cdr;
+        let flag = Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
+        if(Cons.isNil(flag)){ return Cons.nil; }
+        for(let each of theCons.loop()){ anObject = Evaluator.eval(each, this.environment, this.streamManager, this.depth); }
+        
+        return anObject;
     }
 }

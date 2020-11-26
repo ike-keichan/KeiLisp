@@ -2,9 +2,6 @@
 
 'use strict';
 
-// モジュール「Cons」を読み込む。
-import { Cons } from './Cons.js';
-
 /**
  * @class
  * @classdesc Consのイテレータクラス
@@ -16,7 +13,7 @@ export class Loop extends Object
     /**
      * コンストラクタメソッド
      * @constructor
-     * @param {Cons} aCons Cons
+     * @param {Cons} aCons イテレートするCons
      * @return {Loop} 自身
      */
     constructor(aCons)
@@ -56,7 +53,7 @@ export class Loop extends Object
      */
     next() 
     {
-        let anObject = Cons.nth(this.index);
+        let anObject = this.aCons.nth(this.index);
         this.remove();
 
         return anObject;

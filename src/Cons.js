@@ -22,7 +22,7 @@ import { Table } from './Table';
  */
 export class Cons extends Object
 {
-    static nil = new Cons(); // Todo: どうにかできたらする
+    static nil = new Cons();
 
     /**
      * コンストラクタメソッド
@@ -165,6 +165,16 @@ export class Cons extends Object
     }
 
     /**
+     * 引数がインタプリテッドシンボルでないかどうかを判別し、応答するメソッド
+     * @param {*} anObject 判別するオブジェクト
+     * @return {Boolean} 真偽値
+     */
+    static isNotSymbol(anObject)
+    {
+        return !(Cons.isSymbol(anObject));
+    }
+
+    /**
      * 引数が数字かどうかを判別し、応答するメソッド
      * @param {*} anObject 判別するオブジェクト
      * @return {Boolean} 真偽値
@@ -185,7 +195,7 @@ export class Cons extends Object
     }
 
     /**
-     * 引数が自作シンボルかどうかを判別し、応答するメソッド
+     * 引数がインタプリテッドシンボルかどうかを判別し、応答するメソッド
      * @param {*} anObject 判別するオブジェクト
      * @return {Boolean} 真偽値
      */
@@ -210,17 +220,17 @@ export class Cons extends Object
      */
     last()
     {
-        let aCons = new Cons(Cons.nil, this);
-        let anotherCons = this;
+        let theCons = new Cons(Cons.nil, this);
+        let aCons = this;
 
-        while(Cons.isCons(anotherCons))
+        while(Cons.isCons(aCons))
         {
-            if( (Cons.isCons(anotherCons.cdr)) == false ){ break; }
+            if(Cons.isCons(aCons.cdr) == false){ break; }
+            theCons = theCons.cdr;
             aCons = aCons.cdr;
-            anotherCons = anotherCons.cdr;
         }
 
-        return anotherCons;
+        return aCons;
     }
 
     /**

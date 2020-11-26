@@ -1,4 +1,4 @@
-JS_ENGINE	= node
+JS_ENGINE = node
 TARGET	= Example
 TARGET_SCRIPT	= ./$(TARGET).js
 TARGET_HTML	= ./$(TARGET).html

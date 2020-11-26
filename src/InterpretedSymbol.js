@@ -6,7 +6,7 @@ import { Table } from "./Table";
 
 /**
  * @class
- * @classdesc 一意性(同一性:単射性)を有するシンボル.正準な文字列を模倣した、JSの標準シンボルとは異なるクラス。
+ * @classdesc 一意性(同一性:単射性)を有するインタプリテッドシンボル.正準な文字列を模倣した、JSの標準シンボルとは異なるクラス。
  * @author Keisuke Ikeda
  * @this {InterpretedSymbol}
  */
@@ -15,7 +15,7 @@ export class InterpretedSymbol extends Object
     /**
      * InterpretedSymbolを記憶させるテーブル
      */
-    static table = new Table(); // Todo: どうにかできたらする
+    static table = new Table();
 
     /**
      * コンストラクタメソッド
@@ -31,7 +31,7 @@ export class InterpretedSymbol extends Object
     }
 
     /**
-     * 印字名で自身と引数のシンボルを比較するメソッド
+     * 印字名で自身と引数のインタプリテッドシンボルを比較するメソッド
      * @param {InterpretedSymbol} aSymbol 
      * @return {Number} 文字列の長さの差
      */
@@ -54,9 +54,9 @@ export class InterpretedSymbol extends Object
     }
     
     /**
-     * 同じ印字名に対して同一のシンボルを応答するメソッド
+     * 同じ印字名に対して同一のインタプリテッドシンボルを応答するメソッド
      * @param {String} aString 印字名
-     * @return aSymbol 引数と同一のシンボル
+     * @return aSymbol 引数と同一のインタプリテッドシンボル
      */
     static of(aString)
     {

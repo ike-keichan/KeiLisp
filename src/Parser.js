@@ -82,7 +82,7 @@ export class Parser extends Object
 
         // Tableオブジェクト「inputs」から引数の1文字「aCharacter」の文字コードに対応したメソッドを実行し、値を取得する。
         let aNumber = new Number();
-        aNumber = (String(aCharacter.charCodeAt(0))) ? inputs.get(String(aCharacter.charCodeAt(0))).next(this) : inputs.get(String(128)).next(this);
+        aNumber = (inputs.has(String(aCharacter.charCodeAt(0)))) ? inputs.get(String(aCharacter.charCodeAt(0))).next(this) : inputs.get(String(128)).next(this);
 
         if(aNumber < 0){ throw new Error('Syntax Error!'); }
         this.state = aNumber;

@@ -29,33 +29,28 @@ export class StreamManager extends Object
     getStream(aString)
     {
         let aPrintStream = null;
+        if(this.isTrace){ return this.traceStream(); }
 
-        const stream = fs.createReadStream(file);
-        const rl = require('readline').createInterface({
-            input: stream
-        });
-
-        if(this.isTrace()){ return this.traceStream(); }
-
-        try
-        {
+        // try
+        // {
             let filePath = process.env.HOME;
-            filePath = aString.replaceAll('~', filePath);
+            // filePath = aString.replaceAll('~', filePath);
 
             if(this.streamTable.has(filePath)){ aPrintStream = this.streamTable.get(filePath); }
-            else
-            {
-                aPrintStream = rl;
-                this.streamTable.set(filePath, aPrintStream);
-            }
-        }
-        catch(e){ throw new Error("Stream is not found."); }
+            // else
+            // {
+            //     aPrintStream = new PrintStream(new File(filePath), "UTF8");
+            //     this.streamTable.set(filePath, aPrintStream);
+            // }
+        // }
+        // catch(e){ throw new Error("Stream is not found."); }
 
         return aPrintStream;
     }
 
     /**
      * インスタンス変数を初期設定するメソッド
+     * @return {Null} 何も返さない。
      */
     initialize()
     {
@@ -71,12 +66,6 @@ export class StreamManager extends Object
         if(this.isTrace){ return true; }
         if(this.spyTable_().has(aSymbol)){ return true; }
         return false;
-    }
-
-    isTrace(aBoolean)
-    {
-        this.isTrace = aBoolean;
-        return null;
     }
 
     noSpy(aSymbol)
@@ -123,7 +112,7 @@ export class StreamManager extends Object
 
     spyStream(aSymbol)
     {
-        if(this.isTrace()){ return this.traceStream; }
+        if(this.isTrace){ return this.traceStream; }
         if(this.spyTable_().has(aSymbol))
         {
             return this.spyTable_().get(aSymbol);
@@ -146,8 +135,8 @@ export class StreamManager extends Object
         this.noTrace();
         aPrintStream = this.getStream(aString);
         if(aPrintStream == null){ aPrintStream = this.getStream("default") }
-        this.traceStream(aPrintStream);
-        this.isTrace(true);
+        this.setTraceStream(aPrintStream);
+        this.setIsTrace(true);
 
         return null;
     }

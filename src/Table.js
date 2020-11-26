@@ -7,7 +7,7 @@ import { Cons } from './Cons.js';
 
 /**
  * @class
- * @classdesc シンボルの束縛を管理するクラス
+ * @classdesc インタプリテッドシンボルの束縛を管理するクラス
  * @author Keisuke Ikeda
  * @this {Table}
  */
@@ -50,7 +50,7 @@ export class Table extends Map
      * @param {Symbol} aSymbol プロパティ（キー）
      * @return {Boolean} 真偽値
      */
-    containKey(aSymbol)
+    has(aSymbol)
     {
         if( super.has(aSymbol) ){ return true; }
         if(this.isRoot()){ return false; }
@@ -69,9 +69,9 @@ export class Table extends Map
     }
 
     /**
-     * シンボルが束縛しているものを応答するメソッド
-     * @return {Symbol} シンボル
-     * @return {Object} シンボルが束縛している値
+     * インタプリテッドシンボルが束縛しているものを応答するメソッド
+     * @return {Symbol} インタプリテッドシンボル
+     * @return {Object} インタプリテッドシンボルが束縛している値
      */
     get(aSymbol)
     {
@@ -91,17 +91,17 @@ export class Table extends Map
     }
 
     /**
-     * この環境にシンボルは登録されていなければ、上書きするメソッド
-     * @param {Symbol} aSymbol 登録するシンボル
+     * この環境にインタプリテッドシンボルは登録されていなければ、上書きするメソッド
+     * @param {Symbol} aSymbol 登録するインタプリテッドシンボル
      * @param {*} anObject 束縛する値
      * @return {*} 結果
      */
-    putIfExit(aSymbol, anObject)
+    setIfExit(aSymbol, anObject)
     {
         let answer;
         if( super.has(aSymbol) ){ answer = this.set(aSymbol, anObject); }
         if(this.isRoot()){ answer = null; }
-        else { answer = this.source.putIfExit(aSymbol, anObject); }
+        else { answer = this.source.setIfExit(aSymbol, anObject); }
 
         return answer;
     }

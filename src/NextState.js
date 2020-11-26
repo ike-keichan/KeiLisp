@@ -13,7 +13,6 @@ import * as R from 'ramda';
  */
 export class NextState extends Object
 {
-
     /**
      * コンストラクタメソッド
      * @constructor
@@ -33,8 +32,9 @@ export class NextState extends Object
     }
 
     /**
-     * 
-     * @param {Parser} anAutomaton 
+     * 入力された文字に対応するメソッドを呼び出し、トークン番号を応答するメソッド
+     * @param {Parser} anAutomaton パースするためのメソッドを呼び出すインスタンス
+     * @return {Number} 環境の状況を表す数字、トークン番号
      */
     next(anAutomaton)
     {

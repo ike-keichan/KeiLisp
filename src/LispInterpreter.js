@@ -75,7 +75,7 @@ export class LispInterpreter extends Object
            if(leftParentheses <= 0)
            {
                aCons = this.parse(aString);
-            //    for(let each of aCons.loop()){ console.log(each.toString()); }
+               // for(let each of aCons.loop()){ console.log(each.toString()); } //デバック用
                for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }
                leftParentheses = 0;
                aString = new String();
@@ -160,7 +160,7 @@ export class LispInterpreter extends Object
         aList.push('bind');
         aList.push('car');
         aList.push('cdr');
-        aList.push('character');
+        aList.push('character?');
         aList.push('cond');
         aList.push('cons');
         aList.push('copy');
@@ -174,10 +174,10 @@ export class LispInterpreter extends Object
         aList.push('equal?');
         aList.push('exit');
         aList.push('gc');
-        aList.push('gentemp');
+        aList.push('gensym');
         aList.push('if');
         aList.push('integer?');
-        aList.push('lamda');
+        aList.push('lambda');
         aList.push('let');
         aList.push('let*');
         aList.push('last');
@@ -187,12 +187,11 @@ export class LispInterpreter extends Object
         aList.push('member');
         aList.push('mod');
         aList.push('multiply');
-        aList.push('nospy');
         aList.push('not');
         aList.push('notrace');
         aList.push('nth');
         aList.push('null?');
-        aList.push('nember?');
+        aList.push('number?');
         aList.push('or');
         aList.push('pop!');
         aList.push('progn');
@@ -201,10 +200,7 @@ export class LispInterpreter extends Object
         aList.push('set!');
         aList.push('set-all!');
         aList.push('set-car!');
-        aList.push('set-car-all!');
         aList.push('set-cdr!');
-        aList.push('set-cdr-all!');
-        aList.push('spy');
         aList.push('subtract');
         aList.push('string?');
         aList.push('symbol?');
@@ -217,7 +213,7 @@ export class LispInterpreter extends Object
         aList.push('*');
         aList.push('/');
         aList.push('=');
-        // aList.push('==');
+        aList.push('==');
         aList.push('<');
         aList.push('<=');
         aList.push('>');

@@ -16,11 +16,12 @@ then
     "author": "Ikeda Keisuke（池田 敬祐）",
     "license": "BSD-2-Clause",
     "devDependencies": {
-        "@babel/core": "^7.12.3",
+        "@babel/core": "^7.12.8",
         "@babel/plugin-proposal-class-properties": "^7.12.1",
-        "@babel/preset-env": "^7.12.1",
-        "babel-loader": "^8.1.0",
+        "@babel/preset-env": "^7.12.7",
+        "babel-loader": "^8.2.1",
         "eslint": "^7.12.1",
+        "expose-gc": "^1.0.0",
         "jsdoc": "^3.6.6",
         "ramda": "^0.27.1",
         "readline": "^1.3.0",
@@ -74,6 +75,12 @@ if [ ! -e ./node_modules/.bin/readline ]
 then
 	echo '-----Installing readline...-----'
 	npm install --save-dev readline 2> /dev/null | grep -e '+ readline' -e 'added [0-9]\+ packages'
+fi
+
+if [ ! -e ./node_modules/.bin/expose-gc ]
+then
+	echo '-----Installing expose-gc...-----'
+	npm install --save-dev expose-gc 2> /dev/null | grep -e '+ expose-gc' -e 'added [0-9]\+ packages'
 fi
 
 if [ ! -e ./node_modules/.bin/ramda ]

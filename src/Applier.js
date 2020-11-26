@@ -8,6 +8,9 @@ import * as R from 'ramda';
 // モジュール「Cons」を読み込む。
 import { Cons } from './Cons.js';
 
+// モジュール「Evaluator」を読み込む。
+import { Evaluator } from './Evaluator.js';
+
 //モジュール「InterpretedSymbol」を読み込む。
 import { InterpretedSymbol } from './InterpretedSymbol';
 
@@ -31,13 +34,16 @@ export class Applier extends Object
      */
     static buildInFunctions = Applier.setup();
 
+    /**
+	 * gensymで後ろに結合する数字
+	 */
     static generateNumber = 0;
 
     /**
      * コンストラクタメソッド
      * @constructor
      * @param {Table} aTable 環境のテーブル（予約語）
-     * @param {StreamManager} PaStreamManager
+     * @param {StreamManager} aStreamManager
      * @param {Number} aNumber 呼び出しの深さ
      * @return {Applier} 自身
      */
@@ -79,8 +85,8 @@ export class Applier extends Object
 
     /**
      * Number型の値の和を応答するメソッド
-     * @param {Number} init 引数のcar
-     * @param {Cons} args 引数のcdr
+     * @param {Number} init 第1引数
+     * @param {Cons} args 第2~引数
      * @return {Number} 計算結果
      */
     add_Number(init, args)
@@ -88,7 +94,7 @@ export class Applier extends Object
         let result = init;
         let aCons = args;
 
-        while(!Cons.isNil(aCons))
+        while(Cons.isNotNil(aCons))
         {
             let each = aCons.car;
             if(Cons.isNumber(each)){ result = result + each; }
@@ -129,30 +135,33 @@ export class Applier extends Object
         return this.entrustEvaluator(procedure, args);
     }
 
+    /**
+     * 第2引数から第1引数で指定される項目を検索し、応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
     assoc(args)
     {
         let aCons = new Cons();
         let target = args.car;
 
-        if(!Cons.isCons(arguments.nth(2))){ return Cons.nil; }
+        if(Cons.isNotCons(args.nth(2))){ return Cons.nil; }
         aCons = args.nth(2);
 
-        for(let each of aList.loop())
+        for(let each of aCons.loop())
         {
-            if(!Cons.isCons(each)){ console.log('Can not apply \"assoc\" to \"' + each + '\"') }
+            if(Cons.isNotCons(each)){ console.log('Can not apply \"assoc\" to \"' + each + '\"') }
             let key = each.car;
-
             if(this.equal_(new Cons(target, new Cons(key, Cons.nil))) == InterpretedSymbol.of('t')){ return each; }
         }
 
         return Cons.nil;
-        // Todo:実装不十分
     }
 
     /**
      * 引数がAtomかどうかを判別し、応答するメソッド。
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     atom_(args)
     {
@@ -160,26 +169,33 @@ export class Applier extends Object
         return Cons.nil;
     }
 
+    /**
+     * 引数と値を束縛するメソッド
+     * @param {Cons} parameter 値
+     * @param {Cons} args 引数
+     * @return {Null} 何も返さない。
+     */
     binding(parameter, args)
     {
+        if(Cons.isNil(parameter)){ return null; }
         let aCons = parameter;
         let theCons = args;
-
-        if(Cons.isNil(parameter)){ return null; }
-        while(!Cons.isNil(aCons))
+        
+        while(Cons.isNotNil(aCons))
         {
-            try { this.environment.set(aList.car, theCons.car); }
-            catch(e) { throw new Error('sizes do not match.'); }
-            if(!Cons.isCons(aCons.cdr)){ break; }
+            try { this.environment.set(aCons.car, theCons.car); }
+            catch(e) { console.log('sizes do not match.'); return null; }
+
+            if(Cons.isNotCons(aCons.cdr)){ break; }
             aCons = aCons.cdr;
             theCons = theCons.cdr;
         }
 
-        if(Cons.isAtom(aCons.cdr) && (!Cons.isNil(aCons.cdr)))
+        if(Cons.isAtom(aCons.cdr) && (Cons.isNotNil(aCons.cdr)))
         {
             try { this.environment.set(aCons.cdr, theCons.cdr); }
-            catch(e) { throw new Error('sizes do not match.'); }
-        }else if(!Cons.isNil(aCons.cdr)){ throw new Error('Can not binding value to \"' + aList.cdr() + '\"'); }
+            catch(e) { console.log('sizes do not match.'); return null; }
+        }else if(Cons.isNotNil(aCons.cdr)){ throw new Error('Can not binding value to \"' + aList.cdr() + '\"'); }
 
         return null;
     }
@@ -192,32 +208,27 @@ export class Applier extends Object
      */
     buildInFunction(procedure, args)
     {
-        let answer = null;
+        let answer = Cons.nil;
         let methodName = new String();
 
-        // try
-        // {
-            if(this.isSpy(procedure))
-            {
-                this.spyPrint(this.streamManager.spyStream(procedure), (new Cons(procedure, args)).toString());
-                this.setDepth(this.depth + 1);
-            }
+        if(this.isSpy(procedure))
+        {
+            this.spyPrint(this.streamManager.spyStream(procedure), (new Cons(procedure, args)).toString());
+            this.setDepth(this.depth + 1);
+        }
 
-            methodName = Applier.buildInFunctions.get(procedure);
+        methodName = Applier.buildInFunctions.get(procedure);
 
-            try { let method = this[methodName]; }
-            catch(e){ console.log('Not Found Method: ' + methodName); }
+        try { let method = this[methodName]; }
+        catch(e){ console.log('Not Found Method: ' + methodName); }
 
-            try { answer = R.invoker(1, methodName)(args, this); }
-            catch(e) { console.log('Not Invoke Method: ' + methodName); }
+        answer = R.invoker(1, methodName)(args, this); 
 
-            if(this.isSpy(procedure))
-            {
-                this.setDepth(this.depth - 1);
-                this.spyPrint(this.streamManager.spyStream(procedure), answer + ' <== ' + new Cons(procedure, args));
-            }
-        // }
-        // catch(e){ throw new Error('Exception (Applier, buildInFunction)'); }
+        if(this.isSpy(procedure))
+        {
+            this.setDepth(this.depth - 1);
+            this.spyPrint(this.streamManager.spyStream(procedure), answer + ' <== ' + new Cons(procedure, args));
+        }
        
         return answer;
     }
@@ -245,7 +256,7 @@ export class Applier extends Object
     /**
      * 引数が文字(Character)かどうかを判別し、応答するメソッド。
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     character_(args)
     {
@@ -256,7 +267,7 @@ export class Applier extends Object
     /**
      * 第一引数と第二引数のリストを結合し、応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     cons(args)
     {
@@ -266,7 +277,7 @@ export class Applier extends Object
     /**
      * 引数のリストを複製し、応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     copy(args)
     {
@@ -288,8 +299,8 @@ export class Applier extends Object
 
     /**
      * Number型の値の商を応答するメソッド
-     * @param {Number} init 引数のcar
-     * @param {Cons} args 引数のcdr
+     * @param {Number} init 第1引数
+     * @param {Cons} args 第2~引数
      * @return {Number} 計算結果
      */
     divide_Number(init, args)
@@ -297,7 +308,7 @@ export class Applier extends Object
         let result = init;
         let aCons = args;
 
-        while(!Cons.isNil(aCons))
+        while(Cons.isNotNil(aCons))
         {
             let each = aCons.car;
             if(Cons.isNumber(each)){ result = result / each; }
@@ -311,7 +322,7 @@ export class Applier extends Object
     /**
      * 引数が浮動小数倍精度数(Double)かどうかを判別し、応答するメソッド。
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     double_(args)
     {
@@ -329,11 +340,12 @@ export class Applier extends Object
         let anObject = Cons.nil;
         let aCons = procedure.cdr;
         this.binding(aCons.car, args);
+        aCons = aCons.cdr;
 
         for(let each of aCons.loop())
         {
             if(each instanceof Table){ break; }
-            anObject = EvalError.eval(each, this.environment, this.streamManager, this.depth);
+            anObject = Evaluator.eval(each, this.environment, this.streamManager, this.depth);
         }
 
         return anObject;
@@ -342,7 +354,7 @@ export class Applier extends Object
     /**
      * 2つの引数の同値性を判別し、応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     eq_(args)
     {
@@ -356,7 +368,7 @@ export class Applier extends Object
     /**
      * 2つの引数の同一性を判別し、応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     equal_(args)
     {
@@ -367,30 +379,161 @@ export class Applier extends Object
         return Cons.nil;
     }
 
-    format()
+    /**
+     * 指定されたフォーマットで出力を行うメソッド
+     * @param {Cons} args 引数
+     * @return {Cons} nil
+     */
+    format(args)
     {
-
+        if(!Cons.isString(args.car)){ console.log('Can not apply \"format\" to \"' + args.car + '\"'); }
+        let aCons = args.cdr;
+        let format = this.format_AUX(new String(args.car), aCons);
+        console.log(format);
+        return Cons.nil;
     }
 
-    format_AUX()
+    /**
+     * formatの補助メソッド
+     * @param {String} format 指定フォーマット
+     * @param {Cons} aCons フォーマットに割り当てる変数
+     * @return {String} 指定フォーマットに合わせて整えた文字列
+     */
+    format_AUX(format, aCons)
     {
+        let theCons = aCons;
+        let index = 0;
+        let state = 0;
+        let buffer = new String();
+        let token = new String();
 
+        while(index < format.length)
+        {
+            let aCharacter = format[index];
+            if(state == 0)
+            {
+                if(aCharacter == '~'){ state = 1; }
+                else{ buffer += aCharacter; }
+            }
+            else if (state == 1)
+			{
+				switch (aCharacter)
+				{
+                    case '0': case '1': case '2': case '3':	case '4': case '5':	case '6': case '7': case '8': case '9':
+                        token += aCharacter;
+                        state = 2;
+                        break;
+                    case 'a':
+                        buffer += theCons.car.toString();
+                        theCons = theCons.cdr;
+                        state = 0;
+                        break;
+                    case '%':
+                        buffer += '\n';
+                        state = 0;
+                        break;
+                    case '-':
+                        state = 3;
+                        break;
+                    default:
+                        buffer += '~';
+                        buffer += aCharacter;
+                        state = 0;
+                    }
+            }
+            else if (state == 2)
+            {
+                let size;
+                let value = new String();
+
+                switch (aCharacter)
+                {
+                    case '0': case '1': case '2': case '3':	case '4': case '5':	case '6': case '7': case '8': case '9':
+                        token += aCharacter;
+                        state = 2;
+                        break;
+                    case 'a':
+                        size = Number(token.toString());
+                        token = new String();
+                        if(Cons.isNil(theCons)){ console.log('size do not match.'); return; }
+                        value = theCons.car.toString();
+                        theCons = theCons.cdr;
+                        while(value.length() < size){ value += ' '; }
+                        buffer += value;
+                        state = 0;
+                        break;
+                    default:
+                        buffer += '~';
+                        buffer += token.toString() + aCharacter;
+                        token = new String();
+                        state = 0;
+                }
+            }
+            else if (state == 3)
+            {
+                let size;
+                let spaces = new String();
+                let value = new String();
+
+                switch (aCharacter)
+                {
+                    case '0': case '1': case '2': case '3':	case '4': case '5':	case '6': case '7': case '8': case '9':
+                        token += aCharacter;
+                        state = 3;
+                        break;
+                    case 'a':
+                        size = Number(token.toString());
+                        token = new String();
+                        if(Cons.isNil(theCons)){ console.log('size do not match.'); return; }
+                        value = theCons.car.toString();
+                        theCons = theCons.cdr;
+                        spaces = "";
+                        while(value.length() + spaces.length() < size){ spaces += ' '; }
+                        buffer += spaces + value;
+                        state = 0;
+                        break;
+                    default:
+                        buffer += '~';
+                        buffer += '-';
+                        buffer += token.toString() + aCharacter;
+                        token = new String();
+                        state = 0;
+                }
+            }
+            else{ console.log('Error!'); }
+            index++;
+        }
+        if(Cons.isNotNil(theCons)){ console.log('size do not match.'); return; }
+        
+        return buffer;
     }
 
-    genTemp()
+    /**
+     * 指定されたインタプリテッドシンボルに適当な数字をつけたインタプリテッドシンボルを応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    gensym(args)
     {
+        if(Cons.isNotSymbol(args.car)){ console.log('Can not apply \"gensym\" to \"' + args.car + '\"'); return Cons.nil; }
+        let aSymbol = InterpretedSymbol.of(args.car.toString() + Applier.generateNumber);
+        Applier.incrementGenerateNumber();
 
+        return aSymbol;
     }
 
-    getStream()
+    getStream(anObject)
     {
+        if(this.streamManager == null){ return process.out; }
+        if(anObject instanceof String || (typeof anObject) == "string"){ return process.out; }
 
+        return this.streamManager.getStream(anObject);
     }
 
     /**
      * 2つの値が大なり関係にあるかどうか判別し、応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     greaterThan(args)
     {
@@ -402,9 +545,9 @@ export class Applier extends Object
 
     /**
      * Number型の2つの値が大なり関係にあるかどうか判別し、応答するメソッド
-     * @param {Number} init 引数のcar
-     * @param {Cons} args 引数のcdr
-     * @return {*} 評価値
+     * @param {Number} init 第1引数
+     * @param {Cons} args 第2~引数
+     * @return {*} 評価結果
      */
     greaterThan_Number(init, args)
     {
@@ -412,7 +555,7 @@ export class Applier extends Object
         let aCons = args;
         let aBoolean = true;
 
-        while(!Cons.isNil(aCons))
+        while(Cons.isNotNil(aCons))
         {
             let rightValue = aCons.car;
             if(Cons.isNumber(rightValue)){ aBoolean = leftValue > rightValue; }
@@ -428,7 +571,7 @@ export class Applier extends Object
     /**
      * 二つの値が大なりイコール関係にあるかどうか判別し、応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     greaterThanOrEqual(args)
     {
@@ -440,9 +583,9 @@ export class Applier extends Object
 
     /**
      * Number型の二つの値が大なりイコール関係にあるかどうか判別し、応答するメソッド
-     * @param {Number} init 引数のcar
-     * @param {Cons} args 引数のcdr
-     * @return {*} 評価値
+     * @param {Number} init 第1引数
+     * @param {Cons} args 第2~引数
+     * @return {*} 評価結果
      */
     greaterThanOrEqual_Number(init, args)
     {
@@ -450,7 +593,7 @@ export class Applier extends Object
         let aCons = args;
         let aBoolean = true;
 
-        while(!Cons.isNil(aCons))
+        while(Cons.isNotNil(aCons))
         {
             let rightValue = aCons.car;
             if(Cons.isNumber(rightValue)){ aBoolean = leftValue >= rightValue; }
@@ -463,6 +606,10 @@ export class Applier extends Object
         return InterpretedSymbol.of('t');
     }
 
+    /**
+     * gensymで後ろに結合する数字を1つ増加させるメソッド
+     * @return {Null} 何も返さない。
+     */
     static incrementGenerateNumber()
     {
         Applier.generateNumber++;
@@ -486,7 +633,7 @@ export class Applier extends Object
     /**
      * 引数が整数(Integer)かどうかを判別し、応答するメソッド。
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     integer_(args)
     {
@@ -505,22 +652,22 @@ export class Applier extends Object
     }
 
     /**
-     * 引数の最後の要素を応答するメソッド
+     * 引数の最後のセルを応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     last(args)
     {
-        if(!Cons.isCons(args)){ return Cons.nil; }
+        if(Cons.isNotCons(args)){ return Cons.nil; }
         let aCons = args.car;
 
-        return aCons.last().cdr;
+        return aCons.last();
     }
 
     /**
      * 2つの値が小なり関係にあるかどうか判別し、応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     lessThan(args)
     {
@@ -532,9 +679,9 @@ export class Applier extends Object
 
     /**
      * Number型の2つの値が小なり関係にあるかどうか判別し、応答するメソッド
-     * @param {Number} init 引数のcar
-     * @param {Cons} args 引数のcdr
-     * @return {*} 評価値
+     * @param {Number} init 第1引数
+     * @param {Cons} args 第2~引数
+     * @return {*} 評価結果
      */
     lessThan_Number(init, args)
     {
@@ -542,7 +689,7 @@ export class Applier extends Object
         let aCons = args;
         let aBoolean = true;
 
-        while(!Cons.isNil(aCons))
+        while(Cons.isNotNil(aCons))
         {
             let rightValue = aCons.car;
             if(Cons.isNumber(rightValue)){ aBoolean = leftValue < rightValue; }
@@ -558,7 +705,7 @@ export class Applier extends Object
     /**
      * 2つの値が小なりイコール関係にあるかどうか判別し、応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     lessThanOrEqual(args)
     {
@@ -570,9 +717,9 @@ export class Applier extends Object
 
     /**
      * Number型の2つの値が小なりイコール関係にあるかどうか判別し、応答するメソッド
-     * @param {Number} init 引数のcar
-     * @param {Cons} args 引数のcdr
-     * @return {*} 評価値
+     * @param {Number} init 第1引数
+     * @param {Cons} args 第2~引数
+     * @return {*} 評価結果
      */
     lessThanOrEqual_Number(init, args)
     {
@@ -580,7 +727,7 @@ export class Applier extends Object
         let aCons = args;
         let aBoolean = true;
 
-        while(!Cons.isNil(aCons))
+        while(Cons.isNotNil(aCons))
         {
             let rightValue = aCons.car;
             if(Cons.isNumber(rightValue)){ aBoolean = leftValue <= rightValue; }
@@ -596,7 +743,7 @@ export class Applier extends Object
     /**
 	 * 引数の値をリストにまとめて応答する.
 	 * @param args
-	 * @return {*} 評価値
+	 * @return {*} 評価結果
 	 */
     list(args)
     {
@@ -607,7 +754,7 @@ export class Applier extends Object
     /**
      * 引数がリストかどうかを判別し、応答するメソッド。
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     list_(args)
     {
@@ -615,21 +762,55 @@ export class Applier extends Object
         return Cons.nil;
     }
 
-    mapCar()
+    /**
+     * 第2引数に第1引数で指定された関数を適用し、応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    mapcar(args)
     {
+        let aCons = new Cons(Cons.nil, Cons.nil);
+        let procedure = args.car;
+        let parameters = args.nth(2);
+        let options = args.cdr.cdr;
+        let theCons = aCons;
+        let index = 1;
 
+        for(let each of parameters.loop())
+        {
+            let argumentsCons = new Cons(Cons.nil, Cons.nil);
+            let temporaryCons = argumentsCons;
+            let anObject;
+
+            if(Cons.isNotNil(each)){
+                for(let arg of options.loop())
+                {
+                    if(Cons.isNotCons(arg)){ consol.log('sizes do not match.'); return Cons.nil; }
+                    temporaryCons.setCdr(new Cons(arg.nth(index), Cons.nil));
+                    temporaryCons = temporaryCons.cdr;
+                }
+            }
+
+            argumentsCons.setCar(each);
+            anObject = Applier.apply(procedure, argumentsCons, this.environment, this.streamManager, this.depth);
+            theCons.setCdr(new Cons(anObject, Cons.nil));
+            theCons = theCons.cdr;
+            index++;
+        }
+
+        return aCons.cdr;
     }
 
     /**
-     * 引数のcdrにcarの要素があれば、その要素が先頭となるConsを応答するメソッド
+     * 第2引数に第1引数の要素があれば、その要素が先頭となるConsを応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     member(args)
     {
         let aSymbol = InterpretedSymbol.of('equal?');
-        if(!Cons.isNil(args.nth(3))){ aSymbol = args.nth(3); }
-        if(!Cons.isCons(args.nth(2))){ return Cons.nil; }
+        if(Cons.isNotNil(args.nth(3))){ aSymbol = args.nth(3); }
+        if(Cons.isNotCons(args.nth(2))){ return Cons.nil; }
         let aCons = args.nth(2);
 
         while(Cons.isCons(aCons))
@@ -662,16 +843,16 @@ export class Applier extends Object
 
     /**
      * Number型の値の剰余を応答するメソッド
-     * @param {Number} init 引数のcar
-     * @param {Cons} args 引数のcdr
+     * @param {Number} init 第1引数
+     * @param {Cons} args 第2~引数
      * @return {Number} 計算結果
      */
-    divide_Number(init, args)
+    mod_Number(init, args)
     {
         let result = init;
         let aCons = args;
 
-        while(!Cons.isNil(aCons))
+        while(Cons.isNotNil(aCons))
         {
             let each = aCons.car;
             if(Cons.isNumber(each)){ result = result % each; }
@@ -697,8 +878,8 @@ export class Applier extends Object
 
     /**
      * Number型の差の積を応答するメソッド
-     * @param {Number} init 引数のcar
-     * @param {Cons} args 引数のcdr
+     * @param {Number} init 第1引数
+     * @param {Cons} args 第2~引数
      * @return {Number} 計算結果
      */
     multiply_Number(init, args)
@@ -706,7 +887,7 @@ export class Applier extends Object
         let result = init;
         let aCons = args;
 
-        while(!Cons.isNil(aCons))
+        while(Cons.isNotNil(aCons))
         {
             let each = aCons.car;
             if(Cons.isNumber(each)){ result = result * each; }
@@ -718,9 +899,9 @@ export class Applier extends Object
     }
 
     /**
-     * 引数のcdrのcar番目の要素を応答するメソッド
+     * 第2引数の第1引数番目の要素を応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     nth(args)
     {
@@ -734,7 +915,7 @@ export class Applier extends Object
     /**
      * 引数がnilかどうかを判別し、応答するメソッド。
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     null_(args)
     {
@@ -745,7 +926,7 @@ export class Applier extends Object
     /**
      * 引数がNumberかどうかを判別し、応答するメソッド。
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     number_(args)
     {
@@ -756,7 +937,7 @@ export class Applier extends Object
     /**
      * 実行する処理を選択し、実行するメソッド
      * @param {InterpretedSymbol} procedure 関数名、又はオペレータ
-     * @param {Cons} args 引数の値
+     * @param {Cons} args 引数
      * @return {*} 計算結果
      */
     selectProcedure(procedure, args)
@@ -790,7 +971,7 @@ export class Applier extends Object
             let aTable = new Map();
             aTable.set(InterpretedSymbol.of("abs"), "abs"); //OK?
 			aTable.set(InterpretedSymbol.of("add"), "add"); //OK?
-			aTable.set(InterpretedSymbol.of("assoc"), "assoc");
+			aTable.set(InterpretedSymbol.of("assoc"), "assoc"); //OK?
 			aTable.set(InterpretedSymbol.of("atom?"), "atom_"); //OK?
 			aTable.set(InterpretedSymbol.of("car"), "car"); //OK?
 			aTable.set(InterpretedSymbol.of("cdr"), "cdr"); //OK?
@@ -802,12 +983,12 @@ export class Applier extends Object
 			aTable.set(InterpretedSymbol.of("eq?"), "eq_"); //OK?
 			aTable.set(InterpretedSymbol.of("equal?"), "equal_"); //OK?
 			aTable.set(InterpretedSymbol.of("format"), "format");
-			aTable.set(InterpretedSymbol.of("gentemp"), "gentemp");
+			aTable.set(InterpretedSymbol.of("gensym"), "gensym"); //OK?
 			aTable.set(InterpretedSymbol.of("integer?"), "integer_"); //OK?
 			aTable.set(InterpretedSymbol.of("last"), "last"); //OK?
 			aTable.set(InterpretedSymbol.of("list"), "list"); //OK?
 			aTable.set(InterpretedSymbol.of("list?"), "list_"); //OK?
-			aTable.set(InterpretedSymbol.of("mapcar"), "mapcar");
+			aTable.set(InterpretedSymbol.of("mapcar"), "mapcar"); //OK?
 			aTable.set(InterpretedSymbol.of("member"), "member"); //OK?
 			aTable.set(InterpretedSymbol.of("mod"), "mod"); //OK?
 			aTable.set(InterpretedSymbol.of("multiply"), "multiply"); //OK?
@@ -820,7 +1001,7 @@ export class Applier extends Object
 			aTable.set(InterpretedSymbol.of("+"), "add"); //OK?
 			aTable.set(InterpretedSymbol.of("-"), "subtract"); //OK?
 			aTable.set(InterpretedSymbol.of("*"), "multiply"); //OK?
-			aTable.set(InterpretedSymbol.of("/"), "divide"); //OK?
+            aTable.set(InterpretedSymbol.of("/"), "divide"); //OK?
             aTable.set(InterpretedSymbol.of("="), "eq_"); //OK?
             aTable.set(InterpretedSymbol.of("=="), "equal_"); //OK?
 			aTable.set(InterpretedSymbol.of("<"), "lessThan"); //OK?
@@ -835,18 +1016,17 @@ export class Applier extends Object
 
     spyPrint(aStream, line)
     {
-        aPrintStream = process.stdout;
-        if(aStream != null){  }
+        let aPrintStream = process.stdout;
+        if(aStream != null){ /* Todo: 未実装 */ console.log(aStream); }
         console.log(this.indent() + line);
-        if(aStream != null){  }
+        if(aStream != null){ /* Todo: 未実装 */ console.log(aPrintStream); }
         return null;
-        // Todo:実装不十分
     }
 
     /**
      * 引数がStringかどうかを判別し、応答するメソッド。
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     string_(args)
     {
@@ -869,8 +1049,8 @@ export class Applier extends Object
 
     /**
      * Number型の差の商を応答するメソッド
-     * @param {Number} init 引数のcar
-     * @param {Cons} args 引数のcdr
+     * @param {Number} init 第1引数
+     * @param {Cons} args 第2~引数
      * @return {Number} 計算結果
      */
     subtract_Number(init, args)
@@ -878,7 +1058,7 @@ export class Applier extends Object
         let result = init;
         let aCons = args;
 
-        while(!Cons.isNil(aCons))
+        while(Cons.isNotNil(aCons))
         {
             let each = aCons.car;
             if(Cons.isNumber(each)){ result = result - each; }
@@ -892,7 +1072,7 @@ export class Applier extends Object
     /**
      * 引数がInterpretedSymbolかどうかを判別し、応答するメソッド。
      * @param {Cons} args 引数
-     * @return {*} 評価値
+     * @return {*} 評価結果
      */
     symbol_(args)
     {
@@ -908,7 +1088,6 @@ export class Applier extends Object
      */
     userFunction(procedure, args)
     {
-        let answer = null;
         if(this.isSpy(procedure))
         {
             this.spyPrint(this.streamManager.spyStream(procedure), (new Cons(procedure, args)).toString());
@@ -917,7 +1096,7 @@ export class Applier extends Object
 
         let lambda = this.environment.get(procedure);
         let theEnvironment = lambda.last().car;
-        answer = Applier.apply(lambda, args, theEnvironment, this.streamManager, this.depth);
+        let answer = Applier.apply(lambda, args, theEnvironment, this.streamManager, this.depth);
 
         if(this.isSpy(procedure))
         {
