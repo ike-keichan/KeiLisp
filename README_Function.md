@@ -76,17 +76,17 @@ In this interpreter the following functions are defined.
 + []()
 
 ### abs
-Function to find the absolute value of X.
-
 (abs X)
-
-| --- | --- | 
-|  X  |  Atom of Number  |
-|  return  |  the absolute value of X  |
-
+Function to find the absolute value of X.
 
 ```
 >> (abs -10.0)
 10
 ```
+
+### add
+(add X Y)
+Function to find the sum of X and Y.
+
+
 
