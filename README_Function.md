@@ -79,7 +79,7 @@ In this interpreter the following functions are defined.
 Function to find the absolute value of X.
 
 (abs X)
-|     |     |
+
 | --- | --- | 
 |  X  |  Atom of Number  |
 |  return  |  the absolute value of X  |
