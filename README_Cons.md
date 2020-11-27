@@ -4,8 +4,8 @@
 ## Atom
 In this interpreter, the following are called Cons.
 
-+ [Pairs](###Pairs)
-+ [Nil](###Nil)
++ [Pairs](#pairs)
++ [Nil](#nil)
 
 ### Pairs
 Pairs are separated by "(", ". )" and a space or other separator.

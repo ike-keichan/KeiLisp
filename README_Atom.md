@@ -4,9 +4,9 @@
 ## Atom
 In this interpreter, the following are called atoms.
 
-+ [Symbol](###Symbol)
-+ [Number](###Number)
-+ [String](###String)
++ [Symbol](#symbol)
++ [Number](#number)
++ [String](#string)
 
 ### Symbol
 You must start with an alphabetic character.
@@ -59,7 +59,7 @@ The interpreter recognizes when you write a number as follows.
 ```
 
 ### String
-The string must be enclosed in ".
+The string must be enclosed in " " ".
 The interpreter recognizes when you write a string as follows.
 
 ```
