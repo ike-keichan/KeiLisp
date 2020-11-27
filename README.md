@@ -59,6 +59,11 @@ $ cd ./JSLisp
 $ make test
 ```
 
+### Syntax
++ [Atom](./README_Atom.md)
++ [Cons](./README_Cons.md)
++ [Function](./README_Function.md)
+
 ### Example
 #### example1
 ```
