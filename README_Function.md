@@ -1,9 +1,8 @@
 # JSLisp
-（this document fix： 2020/11/27 create: 2020/11/27）
+（this document fix： 2020/11/29 create: 2020/11/27）
 
 ## Function
 In this interpreter the following functions are defined.
-
 
 + [abs](#abs)
 + [add](#add)
@@ -32,50 +31,50 @@ In this interpreter the following functions are defined.
 + [exit](#exit)
 + [gc](#gc)
 + [gensym](#gensym)
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
-+ []()
++ [if](#if)
++ [integerp](#integerp)
++ [lambda](#lambda)
++ [let](#let)
++ [let*](#let*)
++ [last](#last)
++ [length](#length)
++ [listp](#listp)
++ [mapcar](#mapcar)
++ [member](#member)
++ [mod](#mod)
++ [multipy](#multiply)
++ [not](#not)
++ [notrace](#notrace)
++ [nth](#nth)
++ [nthcdr](#nthcdr)
++ [null](#null)
++ [numberp](#numberp)
++ [pop]()
++ [progn]()
++ [push]()
++ [quote]()
++ [reverse]()
++ [setq]()
++ [set-allq]()
++ [set-carq]()
++ [set-cdrq]()
++ [subtract]()
++ [stringp]()
++ [symbolp]()
++ [time]()
++ [trace]()
++ [unless]()
++ [when]()
++ [+]()
++ [-]()
++ [*]()
++ [/]()
++ [=]()
++ [==]()
++ [<]()
++ [<=]()
++ [>]()
++ [>=]()
 
 ### abs
 **(abs X)**
@@ -357,6 +356,8 @@ t
 nil
 >> (doublep -12.3)
 t
+>> (doublep 'a)
+nil
 ```
 
 ### eq
@@ -430,118 +431,230 @@ id0
 id1
 ```
 
-###
+### if
+**(if X Y Z)**
+
+```
+>> (if t (+ 2 3) (* 2 3))
+5
+>> (if nil (+ 2 3) (* 2 3))
+6
+>> (if (= 1 1) (+ 2 3) (* 2 3))
+5
+>> (if (= 1 2) (+ 2 3) (* 2 3))
+6
+```
+
+### integerp
+**(integerp X)**
+Function to answer whether X is an Integer.
+
+```
+>> (integerp 12)
+t
+>> (integerp 12.3)
+nil
+>> (integerp -12)
+t
+>> (integerp -12.3)
+nil
+>> (integerp 'a)
+nil
+```
+
+### lambda
+**(lamda X Y)**
+
+```
+>>  (lambda (a b) (+ a b))
+(lambda (a b) (+ a b))
+>> ((lambda (a b) (+ a b)) 1 2)
+3
+```
+
+### let
 ****
 
 ```
 ```
 
-###
+### let*
 ****
 
 ```
 ```
 
-###
-****
+### last
+**(last L)**
 
 ```
+>> (last '(a b c d e f g h i j))
+(j)
+>> (last '(1 (2 (3 4) (5) (6 7) 8) 9))
+(9)
+>> (last '(((k (r s t u)) g (m)) c d ((n) (o (v w x y z) q))))
+(((n) (o (v w x y z) q)))
 ```
 
-###
-****
+### length
+**(length L)**
 
 ```
+>> (length '(a b c d e f g h i j))
+10
+>> (length '(1 (2 (3 4) (5) (6 7) 8) 9))
+3
+>> (length '(((k (r s t u)) g (m)) c d ((n) (o (v w x y z) q))))
+4
 ```
 
-###
-****
+### list
+**(list X1 X2 ... Xn)**
 
 ```
+>> (list 'a 'b 'c 'd)
+(a b c d)
+>> (list 1 2 3 4)
+(1 2 3 4)
 ```
 
-###
-****
+### listq
+**(listq X)**
+Function to answer whether X is a List.
 
 ```
+>> (listp '(1 2 3))
+t
+>> (listp '())
+t
+>> (listp 'a)
+nil
+>> (listp 1)
+nil
+>> (listp "a")
+nil
 ```
 
-###
-****
+### mapcar
+**(mapcar X L)**
 
 ```
+>> (mapcar list '(a b c))  
+((a) (b) (c))
+>>  (mapcar (lambda (a) (* a 10)) '(1 2 3))
+(10 20 30)
 ```
 
-###
-****
+### member
+**(member X L)**
 
 ```
+>> (member 'b '(a b c))
+(b c)
+>> (member 'd '(a b c))
+nil
+>> (member '2 '(1 (2 (3 4) (5) (6 7) 8) 9))
+nil
 ```
 
-###
-****
+### mod
+**(mod X1 X2 ... Xn)**
 
 ```
+>> (mod 1000 3)
+1
+>> (mod 100 43 8)   
+6
 ```
 
-###
-****
+### multiply
+**(multiply X1 X2 ... Xn)**
 
 ```
+>> (multiply 2 3)
+6
+>> (multiply 20 30 40)
+24000
 ```
 
-###
-****
+### not
+**(not X)**
 
 ```
+>> (not t)
+nil
+>> (not nil)
+t
+>> (not (= 1 1))
+nil
+>> (not (= 1 2))
+t
 ```
 
-###
-****
+### notrace
+**(notrace)**
 
 ```
+>> (notrace)
+t
 ```
 
-###
-****
+### nth
+**(nth X L)**
 
 ```
+>> (nth 2 '(a b c d e f g h i j))
+b
+>> (nth 2 '(1 (2 (3 4) (5) (6 7) 8) 9))
+(2 (3 4) (5) (6 7) 8)
+>> (nth 4 '(((k (r s t u)) g (m)) c d ((n) (o (v w x y z) q))))
+((n) (o (v w x y z) q))
 ```
 
-###
-****
+### nthcdr
+**(nthcdr X L)**
 
 ```
+>> (nthcdr 2 '(a b c d e f g h i j))
+(c d e f g h i j)
+>> (nthcdr 2 '(1 (2 (3 4) (5) (6 7) 8) 9))
+(9)
+>> (nthcdr 1 '(1 (2 (3 4) (5) (6 7) 8) 9))
+((2 (3 4) (5) (6 7) 8) 9)
 ```
 
-###
-****
+### null
+**(null X)**
+Function to answer whether X is a Nil.
 
 ```
+>> (null '(1 2 3))
+nil
+>> (null '())
+t
+>> (null 'a)
+nil
+>> (null 1)
+nil
+>> (null "a")
+nil
 ```
 
-###
-****
+### numberp
+**(numberp X)**
+Function to answer whether X is a Number.
 
 ```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
+>> (numberp 12)
+t
+>> (numberp 12.3)
+t
+>> (numberp -12)
+t
+>> (numberp -12.3)
+t
+>> (numberp 'a)
+nil
 ```
 
 ###
