@@ -67,8 +67,8 @@ In this interpreter the following functions are defined.
 + [when](#when)
 + [+](#+)
 + [-](#-)
-+ [*](#*)
-+ [/](#/)
++ [*](#-1)
++ [/](#-2)
 + [=](#=)
 + [==](#==)
 + [<](#<)
@@ -744,9 +744,16 @@ nil
 ```
 
 ### progn
-****
+**(progn X1	X2 ... Xn)**
 
 ```
+>> (progn ((a 10))
+        (format "~a" a)
+        (setq a (+ a 10))
+        (format "~a" a))
+10
+20
+nil
 ```
 
 ### push
@@ -995,37 +1002,97 @@ Same as the function "[divide](#divide)".
 ```
 
 ### =
-****
+**(= X Y)**
+Function that answers whether X and Y are equal or not.<br>
+Same as the function "[equal](#equal)".
 
 ```
+>> (= 'a 'a)
+t
+>> (= 'a 'b)
+nil
+>> (= 1 1)
+t
+>> (= 1 2)
+nil
+>> (= 1 1.0)
+t
+>> (= 1 "1")
+nil
+>> (= '(a b) '(a b))
+nil
 ```
 
 ### ==
-****
+**(== X Y)**
+Function that answers whether X and Y are equal or not.<br>
+Same as the function "[eq](#eq)".
 
 ```
+>> (== 'a 'a)
+t
+>> (== 'a 'b)
+nil
+>> (== 1 1)
+t
+>> (== 1 2)
+nil
+>> (== 1 1.0)
+t
+>> (== 1 "1")
+t
+>> (== '(a b) '(a b))
+nil
 ```
 
 ### <
-****
+**(< X1 X2 ... Xn)**
+Function to answers whether X1, X2 ... and Xn is arranged in ascending order with no overlap.
 
 ```
+>> (< 1 2 3)
+t
+>> (< 1 1 2)
+nil
+>> (< 3 2 1)
+nil
 ```
 
 ### <=
-****
+**(<= X1 X2 ... Xn)**
+Function to answers whether X1, X2 ... and Xn is arranged in ascending order with overlap.
 
 ```
+>> (<= 1 2 3)
+t
+>> (<= 1 1 2)
+t
+>> (<= 3 2 1)
+nil
 ```
 
 ### >
-****
+**(> X1 X2 ... Xn)**
+Function to answers whether X1, X2 ... and Xn is arranged in descending order with no overlap.
 
 ```
+>> (> 3 2 1)
+t
+>> (> 2 2 1)
+nil
+>> (> 1 2 3)
+nil
 ```
 
 ### >=
-****
+**(>= X1 X2 ... Xn)**
+Function to answers whether X1, X2 ... and Xn is arranged in descending order with overlap.
 
 ```
+>> (>= 3 2 1)
+t
+>> (>= 2 2 1)
+t
+>> (>= 1 2 3)
+nil
 ```
