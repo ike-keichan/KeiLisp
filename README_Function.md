@@ -49,6 +49,7 @@ In this interpreter the following functions are defined.
 + [nthcdr](#nthcdr)
 + [null](#null)
 + [numberp](#numberp)
++ [or](#or)
 + [pop](#pop)
 + [progn](#progn)
 + [push](#push)
@@ -65,16 +66,16 @@ In this interpreter the following functions are defined.
 + [trace](#trace)
 + [unless](#unless)
 + [when](#when)
-+ [+](#+)
++ [+](#)
 + [-](#-)
 + [*](#-1)
 + [/](#-2)
-+ [=](#=)
-+ [==](#==)
-+ [<](#<)
-+ [<=](#<=)
-+ [>](#>)
-+ [>=](#>=)
++ [=](#-3)
++ [==](#-4)
++ [<](#-5)
++ [<=](#-6)
++ [>](#-7)
++ [>=](#-8)
 
 ### abs
 **(abs X)**
@@ -620,6 +621,7 @@ Same as the function "[*](#*)".
 
 ### not
 **(not X)**
+Function to answer the logical negation of X.
 
 ```
 >> (not t)
@@ -634,6 +636,8 @@ t
 
 ### notrace
 **(notrace)**
+Function to no output the calculation process.<br>
+You can turn on the output with "[trace](#trace)".
 
 ```
 >> (notrace)
@@ -895,6 +899,7 @@ nil
 
 ### time
 **(time X)**
+Function to answer the processing time(ms) of X.
 
 ```
 >> (time)
@@ -907,6 +912,8 @@ nil
 
 ### trace
 **(trace)**
+Function to output the calculation process.<br>
+You can turn off the output with "[notrace](#notrace)".
 
 ```
 >> (trace)
@@ -927,6 +934,7 @@ t
 
 ### unless
 **(unless X Y)**
+Function to do Y when X is nil.
 
 ```
 >> (unless t (+ 3 4))
@@ -941,6 +949,7 @@ nil
 
 ### when
 **(when X Y)**
+Function to do Y when X is t.
 
 ```
 >> (when t (+ 3 4))
