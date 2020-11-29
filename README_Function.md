@@ -328,7 +328,7 @@ List L is a list of temporary variables, functions to do X in parallel.
 ```
 
 ### do* ~~
-**(do* L X1 X2 ... Xn)**
+<br>**(do* L X1 X2 ... Xn)**
 List L is a list of temporary variables, functions to do X in sequence.
 
 ```
@@ -539,7 +539,7 @@ nil
 ```
 
 ### let*  
-**(let* L X1 X2 ... Xn)**
+<br>**(let* L X1 X2 ... Xn)**
 Explicitly create a new environment. List L is a list of temporary variables, functions to do Y in sequence.
 
 ```
