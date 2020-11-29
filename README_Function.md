@@ -88,8 +88,7 @@ Function to answer the absolute value of X.
 
 ### add
 **(add X1 X2 ... Xn)**
-Function to answer the sum of X1, X2 ... and Xn.<br>
-Same as the function "[+](#+)".
+Function to answer the sum of X1, X2 ... and Xn.
 
 ```
 >> (add 1 2)
@@ -280,7 +279,7 @@ nil
 ```
 
 ### copy
-**(copy L)**
+**(copy X)**
 Function to answer a copy of X.
 
 ```
@@ -296,8 +295,8 @@ nil
 ```
 
 ### defun
-**(defun A L X1 X2 ... Xn)**
-Function defining function with A as the function name, L as the argument, and X1, X2 ... and Xn as the process.
+**(defun N L X1 X2 ... Xn)**
+Function defining function with N as the function name, L as the argument, and X1, X2 ... and Xn as the process.
 
 ```
 >> (defun tasu (a b) (+ a b))
@@ -308,8 +307,7 @@ tasu
 
 ### divide
 **(divide X1 X2 ... Xn)**
-Function to answer the quotient of X1 divided by X2 ... and Xn.<br>
-Same as the function "[/](#/)".
+Function to answer the quotient of X1 divided by X2 ... and Xn.
 
 ```
 >> (divide 10 5)
@@ -447,6 +445,7 @@ id1
 
 ### if
 **(if X Y Z)**
+Functions to do Y when X is t and to do Z when X is nil.
 
 ```
 >> (if t (+ 2 3) (* 2 3))
@@ -485,13 +484,40 @@ nil
 ```
 
 ### lambda
-**(lambda X Y)**
+**(lambda L X1 X2 ... Xn)**
+Function to generate the lambda expression with L as the argument, and X1, X2 ... and Xn as the process.
 
 ```
 >>  (lambda (a b) (+ a b))
 (lambda (a b) (+ a b))
 >> ((lambda (a b) (+ a b)) 1 2)
 3
+```
+
+### last
+**(last L)**
+Functions to answer the last element of the list L.
+
+```
+>> (last '(a b c d e f g h i j))
+(j)
+>> (last '(1 (2 (3 4) (5) (6 7) 8) 9))
+(9)
+>> (last '(((k (r s t u)) g (m)) c d ((n) (o (v w x y z) q))))
+(((n) (o (v w x y z) q)))
+```
+
+### length
+**(length L)**
+Function to answer the length of the list L.
+
+```
+>> (length '(a b c d e f g h i j))
+10
+>> (length '(1 (2 (3 4) (5) (6 7) 8) 9))
+3
+>> (length '(((k (r s t u)) g (m)) c d ((n) (o (v w x y z) q))))
+4
 ```
 
 ### let
@@ -522,32 +548,9 @@ nil
 nil
 ```
 
-### last
-**(last L)**
-
-```
->> (last '(a b c d e f g h i j))
-(j)
->> (last '(1 (2 (3 4) (5) (6 7) 8) 9))
-(9)
->> (last '(((k (r s t u)) g (m)) c d ((n) (o (v w x y z) q))))
-(((n) (o (v w x y z) q)))
-```
-
-### length
-**(length L)**
-
-```
->> (length '(a b c d e f g h i j))
-10
->> (length '(1 (2 (3 4) (5) (6 7) 8) 9))
-3
->> (length '(((k (r s t u)) g (m)) c d ((n) (o (v w x y z) q))))
-4
-```
-
 ### list
 **(list X1 X2 ... Xn)**
+Functions to make a list of X1, X2 ... and Xn.
 
 ```
 >> (list 'a 'b 'c 'd)
@@ -577,6 +580,7 @@ nil
 
 ### mapcar
 **(mapcar X L)**
+Functions to apply X to the elements of list L in turn.
 
 ```
 >> (mapcar list '(a b c))  
@@ -587,6 +591,7 @@ nil
 
 ### member
 **(member X L)**
+Functions to answer the list of subsequent elements when the list L contains X.
 
 ```
 >> (member 'b '(a b c))
@@ -599,6 +604,7 @@ nil
 
 ### mod
 **(mod X1 X2 ... Xn)**
+Function to answer the excess of X1 divide by X2 ... and Xn.
 
 ```
 >> (mod 1000 3)
@@ -609,8 +615,7 @@ nil
 
 ### multiply
 **(multiply X1 X2 ... Xn)**
-Function to answer the product of X1 and X2 ... and Xn.<br>
-Same as the function "[*](#*)".
+Function to answer the product of X1 and X2 ... and Xn.
 
 ```
 >> (multiply 2 3)
@@ -646,6 +651,7 @@ t
 
 ### nth
 **(nth X L)**
+Function to answer the X-th element of the list L.
 
 ```
 >> (nth 2 '(a b c d e f g h i j))
@@ -658,6 +664,7 @@ b
 
 ### nthcdr
 **(nthcdr X L)**
+Function to answer the X-th element of tail of the list L.
 
 ```
 >> (nthcdr 2 '(a b c d e f g h i j))
@@ -733,6 +740,7 @@ nil
 
 ### pop
 **(pop L)**
+Function to pop to Symbol-bound list L.
 
 ```
 >> (setq a '(1 2 3))
@@ -762,6 +770,7 @@ nil
 
 ### push
 **(push X L)**
+Function to push the value of X to Symbol-bound list L.
 
 ```
 >> (setq a '())
@@ -776,6 +785,7 @@ nil
 
 ### quote
 **(quote X)**
+Function to answer the reference.
 
 ```
 >> (quote a)
@@ -786,6 +796,7 @@ a
 
 ### reverse
 **(reverse L)**
+Function to answer the list of list L inverse order.
 
 ```
 >> (reverse '(a b c))
@@ -796,6 +807,7 @@ a
 
 ### setq
 **(setq X Y)**
+Functions to bind the value of Y to X.
 
 ```
 >> (setq a 10)
@@ -811,11 +823,11 @@ hello
 20
 >> a
 10
-
 ```
 
 ### set-allq
 **(set-allq X Y)**
+Functions to bind the value of Y to X to the entire environment.
 
 ```
 >> (setq a 10)
@@ -829,6 +841,7 @@ hello
 
 ### set-carq
 **(set-carq X L)**
+Function to bind X to the head of list L.
 
 ```
 >> (setq a '(1 2 3))
@@ -839,6 +852,7 @@ hello
 
 ### set-cdrq
 **(set-cdrq X L)**
+Function to bind X to the tail of list L.
 
 ```
 >> (setq a '(1 2 3))
@@ -849,8 +863,7 @@ hello
 
 ### subtract
 **(subtract X1 X2 ... Xn)**
-Function to answer the difference of X1 minus X2 ... and Xn.<br>
-Same as the function "[-](#-)".
+Function to answer the difference of X1 minus X2 ... and Xn.
 
 ```
 >> (subtract 30 15 10)
