@@ -318,6 +318,7 @@ Function to answer the quotient of X1 divided by X2 ... and Xn.
 
 ### do
 **(do L X1 X2 ... Xn)**
+List L is a list of temporary variables, functions to do X in parallel.
 
 ```
 >> (do* ((ans 0)(a 0 (+ a 1)))
@@ -327,7 +328,8 @@ Function to answer the quotient of X1 divided by X2 ... and Xn.
 ```
 
 ### do*
-**(do* L X1 X2 ... Xn)**
+<br>**(do* L X1 X2 ... Xn)**
+List L is a list of temporary variables, functions to do X in sequence.
 
 ```
 >> (do* ((a 0 (+ a 1)) (ans 0 (+ ans a)))
@@ -337,6 +339,7 @@ Function to answer the quotient of X1 divided by X2 ... and Xn.
 
 ### dolist
 **(dolist L X1 X2 ... Xn)**
+Functions to do X in order for the elements of the list L
 
 ```
 >> (dolist (each '(a b c) t)
@@ -521,7 +524,8 @@ Function to answer the length of the list L.
 ```
 
 ### let
-**(let X Y1 Y2 ... Yn)**
+**(let L X1 X2 ... Xn)**
+Explicitly create a new environment. List L is a list of temporary variables, functions to do Y in parallel.
 
 ```
 >> (setq a 10)
@@ -535,7 +539,8 @@ nil
 ```
 
 ### let*
-**(let* X Y1 Y2 ... Yn)**
+<br>**(let* L X1 X2 ... Xn)**
+Explicitly create a new environment. List L is a list of temporary variables, functions to do Y in sequence.
 
 ```
 >> (setq a 10)
@@ -580,7 +585,7 @@ nil
 
 ### mapcar
 **(mapcar X L)**
-Functions to apply X to the elements of list L in turn.
+Functions to apply X to the elements of list L in sequence.
 
 ```
 >> (mapcar list '(a b c))  
@@ -757,6 +762,7 @@ nil
 
 ### progn
 **(progn X1	X2 ... Xn)**
+Function to run X1, X2 ... and Xn in sequence.
 
 ```
 >> (progn ((a 10))
