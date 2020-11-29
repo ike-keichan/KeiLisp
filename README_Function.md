@@ -327,7 +327,7 @@ List L is a list of temporary variables, functions to do X in parallel.
 45
 ```
 
-### do* ~~
+### do*
 <br>**(do* L X1 X2 ... Xn)**
 List L is a list of temporary variables, functions to do X in sequence.
 
