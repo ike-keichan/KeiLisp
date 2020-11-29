@@ -49,32 +49,32 @@ In this interpreter the following functions are defined.
 + [nthcdr](#nthcdr)
 + [null](#null)
 + [numberp](#numberp)
-+ [pop]()
-+ [progn]()
-+ [push]()
-+ [quote]()
-+ [reverse]()
-+ [setq]()
-+ [set-allq]()
-+ [set-carq]()
-+ [set-cdrq]()
-+ [subtract]()
-+ [stringp]()
-+ [symbolp]()
-+ [time]()
-+ [trace]()
-+ [unless]()
-+ [when]()
-+ [+]()
-+ [-]()
-+ [*]()
-+ [/]()
-+ [=]()
-+ [==]()
-+ [<]()
-+ [<=]()
-+ [>]()
-+ [>=]()
++ [pop](#pop)
++ [progn](#progn)
++ [push](#push)
++ [quote](#quote)
++ [reverse](#reverse)
++ [setq](#setq)
++ [set-allq](#set-allq)
++ [set-carq](#set-carq)
++ [set-cdrq](#set-cdrq)
++ [subtract](#subtract)
++ [stringp](#stringp)
++ [symbolp](#symbolp)
++ [time](#time)
++ [trace](#trace)
++ [unless](#unless)
++ [when](#when)
++ [+](#+)
++ [-](#-)
++ [*](#*)
++ [/](#/)
++ [=](#=)
++ [==](#==)
++ [<](#<)
++ [<=](#<=)
++ [>](#>)
++ [>=](#>=)
 
 ### abs
 **(abs X)**
@@ -87,7 +87,8 @@ Function to answer the absolute value of X.
 
 ### add
 **(add X1 X2 ... Xn)**
-Function to answer the sum of X1, X2 ... and Xn.
+Function to answer the sum of X1, X2 ... and Xn.<br>
+Same as the function ["+"](#+).
 
 ```
 >> (add 1 2)
@@ -97,7 +98,7 @@ Function to answer the sum of X1, X2 ... and Xn.
 ```
 ### and
 **(and X1 X2 ... Xn)**
-Function to answer the logical product of X.
+Function to answer the logical product of X1, X2 ... and Xn.
 
 ```
 >> (and t nil)
@@ -110,7 +111,8 @@ nil
 t
 >> (and nil (= 1 1))
 nil
-
+>> (and nil (= 2 1))
+nil
 ```
 
 ### append
@@ -155,9 +157,11 @@ nil
 nil
 >> (atom 'a)
 t
+>> (atom 1)
+t
 >> (atom "a")
 t
->> (atom 1)
+>> (atom "abc")
 t
 ```
 
@@ -223,6 +227,8 @@ nil
 nil
 >> (characterp "a")
 t
+>> (characterp "abc")
+nil
 ```
 
 ### cond
@@ -235,8 +241,7 @@ Function to answer Yn1, Yn2 ... and Ynn satisfy the Xn condition.
 >> (cond
         ((= 1 2) 10)
         ((= 1 3) 20)
-     	((= 1 1) 30)
-    )
+     	((= 1 1) 30))
 30
 
 ```
@@ -269,6 +274,8 @@ nil
 nil
 >> (consp "a")
 nil
+>> (consp "abc")
+nil
 ```
 
 ### copy
@@ -289,7 +296,7 @@ nil
 
 ### defun
 **(defun A L X1 X2 ... Xn)**
-Function defining function with A as the function name, L as the argument, and X1 X2 ... and Xn as the process.
+Function defining function with A as the function name, L as the argument, and X1, X2 ... and Xn as the process.
 
 ```
 >> (defun tasu (a b) (+ a b))
@@ -300,7 +307,8 @@ tasu
 
 ### divide
 **(divide X1 X2 ... Xn)**
-Function to answer the quotient of X1 divided by X2 ... and Xn.
+Function to answer the quotient of X1 divided by X2 ... and Xn.<br>
+Same as the function ["/"](#/).
 
 ```
 >> (divide 10 5)
@@ -315,8 +323,7 @@ Function to answer the quotient of X1 divided by X2 ... and Xn.
 ```
 >> (do* ((ans 0)(a 0 (+ a 1)))
         ((= a 10) ans)
-        (setq ans (+ ans a))
-    )
+        (setq ans (+ ans a)))
 45
 ```
 
@@ -325,8 +332,7 @@ Function to answer the quotient of X1 divided by X2 ... and Xn.
 
 ```
 >> (do* ((a 0 (+ a 1)) (ans 0 (+ ans a)))
-        ((= a 10) ans)
-    )
+        ((= a 10) ans))
 55
 ```
 
@@ -335,8 +341,7 @@ Function to answer the quotient of X1 divided by X2 ... and Xn.
 
 ```
 >> (dolist (each '(a b c) t)
-        (format "~a" each)
-    )
+        (format "~a" each))
 a
 b
 c
@@ -356,7 +361,15 @@ t
 nil
 >> (doublep -12.3)
 t
+>> (doublep '(1 2 3))
+nil
+>> (doublep '())
+nil
 >> (doublep 'a)
+nil
+>> (doublep "a")
+nil
+>> (doublep "abc")
 nil
 ```
 
@@ -458,12 +471,20 @@ nil
 t
 >> (integerp -12.3)
 nil
+>> (integerp '(1 2 3))
+nil
+>> (integerp '())
+nil
 >> (integerp 'a)
+nil
+>> (integerp "a")
+nil
+>> (integerp "abc")
 nil
 ```
 
 ### lambda
-**(lamda X Y)**
+**(lambda X Y)**
 
 ```
 >>  (lambda (a b) (+ a b))
@@ -473,15 +494,31 @@ nil
 ```
 
 ### let
-****
+**(let X Y1 Y2 ... Yn)**
 
 ```
+>> (setq a 10)
+10
+>> (let ((a 20)
+        (b a))
+        (format "~a~%~a" a b))
+20
+10
+nil
 ```
 
 ### let*
-****
+**(let* X Y1 Y2 ... Yn)**
 
 ```
+>> (setq a 10)
+10
+>> (let* ((a 20)
+        (b a))
+        (format "~a~%~a" a b))
+20
+20
+nil
 ```
 
 ### last
@@ -518,8 +555,8 @@ nil
 (1 2 3 4)
 ```
 
-### listq
-**(listq X)**
+### listp
+**(listp X)**
 Function to answer whether X is a List.
 
 ```
@@ -532,6 +569,8 @@ nil
 >> (listp 1)
 nil
 >> (listp "a")
+nil
+>> (listp "abc")
 nil
 ```
 
@@ -569,6 +608,8 @@ nil
 
 ### multiply
 **(multiply X1 X2 ... Xn)**
+Function to answer the product of X1 and X2 ... and Xn.<br>
+Same as the function ["*"](#*).
 
 ```
 >> (multiply 2 3)
@@ -638,6 +679,8 @@ nil
 nil
 >> (null "a")
 nil
+>> (null "abc")
+nil
 ```
 
 ### numberp
@@ -653,161 +696,335 @@ t
 t
 >> (numberp -12.3)
 t
+>> (numberp '(1 2 3))
+nil
+>> (numberp '())
+nil
 >> (numberp 'a)
+nil
+>> (numberp "a")
+nil
+>> (numberp "abc")
 nil
 ```
 
-###
+### or
+**(or X1 X2 ... Xn)**
+Function to answer the logical sums of X1, X2 ... and Xn.
+
+```
+>> (or t nil)
+t
+>> (or (= 1 1) (= 1 1))
+t
+>> (or (= 1 1) (= 2 1))
+t
+>> (or t (= 1 1))
+t
+>> (or nil (= 1 1))
+t
+>> (or nil (= 2 1))
+nil
+```
+
+### pop
+**(pop L)**
+
+```
+>> (setq a '(1 2 3))
+(1 2 3)
+>> (pop a)
+1
+>> (pop a)
+2
+>> (pop a)
+3
+>> (pop a)
+nil
+```
+
+### progn
 ****
 
 ```
 ```
 
-###
+### push
+**(push X L)**
+
+```
+>> (setq a '())
+nil
+>> (push 1 a)
+(1)
+>> (push 2 a)
+(2 1)
+>> (push 3 a)
+(3 2 1)
+```
+
+### quote
+**(quote X)**
+
+```
+>> (quote a)
+a
+>> (quote 1)
+1
+```
+
+### reverse
+**(reverse L)**
+
+```
+>> (reverse '(a b c))
+(c b a)
+>> (reverse '(1 (2 (3 4) (5) (6 7) 8) 9))
+(9 (2 (3 4) (5) (6 7) 8) 1)
+```
+
+### setq
+**(setq X Y)**
+
+```
+>> (setq a 10)
+10
+>> a
+10
+>> (setq b "hello")
+hello
+>> b
+hello
+>> (let ((a 20))
+        (setq a a))
+20
+>> a
+10
+
+```
+
+### set-allq
+**(set-allq X Y)**
+
+```
+>> (setq a 10)
+10
+>> (let ((a 20))
+        (set-allq a a))
+20
+>> a
+20
+```
+
+### set-carq
+**(set-carq X L)**
+
+```
+>> (setq a '(1 2 3))
+(1 2 3)
+>> (set-carq a 4)
+(4 2 3)
+```
+
+### set-cdrq
+**(set-cdrq X L)**
+
+```
+>> (setq a '(1 2 3))
+(1 2 3)
+>> (set-cdrq a 4)
+(1 . 4)
+```
+
+### subtract
+**(subtract X1 X2 ... Xn)**
+Function to answer the difference of X1 minus X2 ... and Xn.<br>
+Same as the function ["-"](#-).
+
+```
+>> (subtract 30 15 10)
+5
+>> (subtract 30 12.3 4.5)
+13.2
+```
+
+### stringp
+**(stringp X)**
+Function to answer whether X is a String.
+
+```
+>> (stringp '(1 2 3))
+nil
+>> (stringp '())
+nil
+>> (stringp 'a)
+nil
+>> (stringp 1)
+nil
+>> (stringp "a")
+t
+>> (stringp "abc")
+t
+```
+
+### symbolp
+**(symbolp X)**
+Function to answer whether X is a Symbol.
+
+```
+>> (symbolp '(1 2 3))
+nil
+>> (symbolp '())
+nil
+>> (symbolp 'a)
+t
+>> (symbolp 1)
+nil
+>> (symbolp "a")
+nil
+>> (symbolp "abc")
+nil
+```
+
+### time
+**(time X)**
+
+```
+>> (time)
+0.022915
+>> (time (+ 1 2))
+0.210059
+>> (time (length '(a b c d e f g)))
+6.062648
+```
+
+### trace
+**(trace)**
+
+```
+>> (trace)
+t <== trace
+t
+>> (+ 1 (* 2 (+ 3 4)))
+| (+ 1 (* 2 (+ 3 4)))
+| | (* 2 (+ 3 4))
+| | | (+ 3 4)
+| | | (+ 3 4)
+| | | 7 <== (+ 3 4)
+| | (* 2 7)
+| | 14 <== (* 2 7)
+| (+ 1 14)
+| 15 <== (+ 1 14)
+15
+```
+
+### unless
+**(unless X Y)**
+
+```
+>> (unless t (+ 3 4))
+nil
+>> (unless nil (+ 3 4))
+7
+>> (unless (= 1 1) (+ 3 4))
+nil
+>> (unless (= 1 2) (+ 3 4))
+7
+```
+
+### when
+**(when X Y)**
+
+```
+>> (when t (+ 3 4))
+7
+>> (when nil (+ 3 4))
+nil
+>> (when (= 1 1) (+ 3 4))
+7
+>> (when (= 1 2) (+ 3 4))
+nil
+```
+
+### +
+**(+ X1 X2 ... Xn)**
+Function to answer the sum of X1, X2 ... and Xn.<br>
+Same as the function ["add"](#add).
+
+```
+>> (+ 1 2)
+3
+>> (+ 12 -34 5.6 -7.8 90)
+65.8
+```
+
+### subtract
+**(- X1 X2 ... Xn)**
+Function to answer the difference of X1 minus X2 ... and Xn.<br>
+Same as the function ["subtract"](#subtract).
+
+```
+>> (- 30 15 10)
+5
+>> (- 30 12.3 4.5)
+13.2
+```
+
+### *
+**(* X1 X2 ... Xn)**
+Function to answer the product of X1 and X2 ... and Xn.<br>
+Same as the function ["multiply"](#multiply).
+
+```
+>> (* 2 3)
+6
+>> (* 20 30 40)
+24000
+```
+
+### /
+**(/ X1 X2 ... Xn)**
+Function to answer the quotient of X1 divided by X2 ... and Xn.<br>
+Same as the function ["divide"](#divide).
+
+```
+>> (/ 10 5)
+2
+>> (/ 12 5 4)
+0.6
+```
+
+### =
 ****
 
 ```
 ```
 
-###
+### ==
 ****
 
 ```
 ```
 
-###
+### <
 ****
 
 ```
 ```
 
-###
+### <=
 ****
 
 ```
 ```
 
-###
+### >
 ****
 
 ```
 ```
 
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
-****
-
-```
-```
-
-###
+### >=
 ****
 
 ```
