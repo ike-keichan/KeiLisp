@@ -958,7 +958,7 @@ Same as the function "[add](#add)".
 65.8
 ```
 
-### subtract
+### -
 **(- X1 X2 ... Xn)**
 Function to answer the difference of X1 minus X2 ... and Xn.<br>
 Same as the function "[subtract](#subtract)".
