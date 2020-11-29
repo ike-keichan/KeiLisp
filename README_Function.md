@@ -88,7 +88,7 @@ Function to answer the absolute value of X.
 ### add
 **(add X1 X2 ... Xn)**
 Function to answer the sum of X1, X2 ... and Xn.<br>
-Same as the function ["+"](#+).
+Same as the function "[+](#+)".
 
 ```
 >> (add 1 2)
@@ -308,7 +308,7 @@ tasu
 ### divide
 **(divide X1 X2 ... Xn)**
 Function to answer the quotient of X1 divided by X2 ... and Xn.<br>
-Same as the function ["/"](#/).
+Same as the function "[/](#/)".
 
 ```
 >> (divide 10 5)
@@ -609,7 +609,7 @@ nil
 ### multiply
 **(multiply X1 X2 ... Xn)**
 Function to answer the product of X1 and X2 ... and Xn.<br>
-Same as the function ["*"](#*).
+Same as the function "[*](#*)".
 
 ```
 >> (multiply 2 3)
@@ -839,7 +839,7 @@ hello
 ### subtract
 **(subtract X1 X2 ... Xn)**
 Function to answer the difference of X1 minus X2 ... and Xn.<br>
-Same as the function ["-"](#-).
+Same as the function "[-](#-)".
 
 ```
 >> (subtract 30 15 10)
@@ -949,7 +949,7 @@ nil
 ### +
 **(+ X1 X2 ... Xn)**
 Function to answer the sum of X1, X2 ... and Xn.<br>
-Same as the function ["add"](#add).
+Same as the function "[add](#add)".
 
 ```
 >> (+ 1 2)
@@ -961,7 +961,7 @@ Same as the function ["add"](#add).
 ### subtract
 **(- X1 X2 ... Xn)**
 Function to answer the difference of X1 minus X2 ... and Xn.<br>
-Same as the function ["subtract"](#subtract).
+Same as the function "[subtract](#subtract)".
 
 ```
 >> (- 30 15 10)
@@ -973,7 +973,7 @@ Same as the function ["subtract"](#subtract).
 ### *
 **(* X1 X2 ... Xn)**
 Function to answer the product of X1 and X2 ... and Xn.<br>
-Same as the function ["multiply"](#multiply).
+Same as the function "[multiply](#multiply)".
 
 ```
 >> (* 2 3)
@@ -985,7 +985,7 @@ Same as the function ["multiply"](#multiply).
 ### /
 **(/ X1 X2 ... Xn)**
 Function to answer the quotient of X1 divided by X2 ... and Xn.<br>
-Same as the function ["divide"](#divide).
+Same as the function "[divide](#divide)".
 
 ```
 >> (/ 10 5)
