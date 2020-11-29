@@ -23,7 +23,7 @@ In this interpreter the following functions are defined.
 + [defun](#defun)
 + [divide](#divide)
 + [do](#do)
-+ [do*](#do*)
++ [do*](#do-1)
 + [dolist](#dolist)
 + [doublep](#doublep)
 + [eq](#eq)
@@ -35,7 +35,7 @@ In this interpreter the following functions are defined.
 + [integerp](#integerp)
 + [lambda](#lambda)
 + [let](#let)
-+ [let*](#let*)
++ [let*](#let-1)
 + [last](#last)
 + [length](#length)
 + [listp](#listp)
@@ -327,8 +327,8 @@ List L is a list of temporary variables, functions to do X in parallel.
 45
 ```
 
-### do*
-<br>**(do* L X1 X2 ... Xn)**
+### do*  
+**(do* L X1 X2 ... Xn)**
 List L is a list of temporary variables, functions to do X in sequence.
 
 ```
@@ -538,8 +538,8 @@ Explicitly create a new environment. List L is a list of temporary variables, fu
 nil
 ```
 
-### let*
-<br>**(let* L X1 X2 ... Xn)**
+### let*  
+**(let* L X1 X2 ... Xn)**
 Explicitly create a new environment. List L is a list of temporary variables, functions to do Y in sequence.
 
 ```
