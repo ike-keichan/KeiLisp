@@ -59,10 +59,10 @@ In this interpreter the following functions are defined.
 + [push](#push)
 + [quote](#quote)
 + [reverse](#reverse)
++ [rplaca](#rplaca)
++ [rplacd](#rplacd)
 + [setq](#setq)
 + [set-allq](#set-allq)
-+ [set-carq](#set-carq)
-+ [set-cdrq](#set-cdrq)
 + [subtract](#subtract)
 + [stringp](#stringp)
 + [symbolp](#symbolp)
@@ -450,8 +450,8 @@ Function to exit the Lisp interpreter.
 Bye!
 ```
 
-### floatep
-**(doublep X)**
+### floatp
+**(floatp X)**
 Function to answer whether X is a Float.
 
 ```
@@ -931,6 +931,28 @@ Function to answer the list of list L inverse order.
 (9 (2 (3 4) (5) (6 7) 8) 1)
 ```
 
+### rplaca
+**(rplaca X L)**
+Function to bind X to the head of list L.
+
+```
+>> (setq a '(1 2 3))
+(1 2 3)
+>> (rplaca a 4)
+(4 2 3)
+```
+
+### rplacd
+**(rplacd X L)**
+Function to bind X to the tail of list L.
+
+```
+>> (setq a '(1 2 3))
+(1 2 3)
+>> (rplacd a 4)
+(1 . 4)
+```
+
 ### setq
 **(setq X Y)**
 Functions to bind the value of Y to X.
@@ -963,28 +985,6 @@ Functions to bind the value of Y to X to the entire environment.
 20
 >> a
 20
-```
-
-### rplaca
-**(rplaca X L)**
-Function to bind X to the head of list L.
-
-```
->> (setq a '(1 2 3))
-(1 2 3)
->> (rplaca a 4)
-(4 2 3)
-```
-
-### rplacd
-**(rplacd X L)**
-Function to bind X to the tail of list L.
-
-```
->> (setq a '(1 2 3))
-(1 2 3)
->> (rplacd a 4)
-(1 . 4)
 ```
 
 ### subtract
