@@ -572,6 +572,34 @@ export class Evaluator extends Object
     }
 
     /**
+     * 引数を改行ありで出力する関数
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    print(aCons)
+    {
+        let anObject = Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
+        console.log(anObject);
+
+        return anObject;
+
+    }
+
+    /**
+     * 引数を改行なしで出力する関数
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    printc(aCons)
+    {
+        let anObject = Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
+        process.stdout.write(String(anObject));
+
+        return anObject;
+
+    }
+
+    /**
      * 第2引数のインタプリテッドシンボルに束縛されたシンボルに対して、第1引数の値をリストの先頭に登録し、応答するメソッド
      * @param {*} aCons 評価するCons
      * @return {*} 評価結果
@@ -598,11 +626,43 @@ export class Evaluator extends Object
     }
 
     /**
+     * 第２引数で指定されたリストの先頭の要素に第1引数で指定した値を設定し、応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    rplaca(args)
+    {
+        let anObject = Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
+        if(Cons.isNotCons(anObject)){ console.log('Can not apply \"set-car!\" to \"' + anObject + '\"'); return Cons.nil; }
+        let aCons = anObject;
+        anObject = Evaluator.eval(args.nth(2), this.environment, this.streamManager, this.depth);
+        aCons.setCar(anObject);
+
+        return Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
+    }
+
+    /**
+     * 第２引数で指定されたリストの先頭以外の要素に第1引数で指定した値を設定し、応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    rplacd(args)
+    {
+        let anObject = Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
+        if(Cons.isNotCons(anObject)){ console.log('Can not apply \"set-cdr!\" to \"' + anObject + '\"'); return Cons.nil; }
+        let aCons = anObject;
+        anObject = Evaluator.eval(args.nth(2), this.environment, this.streamManager, this.depth);
+        aCons.setCdr(anObject);
+
+        return Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
+    }
+
+    /**
      * 現環境にのみにキーと値を束縛するメソッド
      * @param {Cons} args 引数
      * @return {*} 評価結果
      */
-    set_(args)
+    setq(args)
     {
         let anObject = Cons.nil;
         let anIterator = args.loop();
@@ -629,13 +689,11 @@ export class Evaluator extends Object
      * @param {Cons} args 引数
      * @return {*} 評価結果
      */
-    set_all_(args)
+    set_allq(args)
     {
         let anObject = Cons.nil;
         let anIterator = args.loop();
         let index = -1;
-
-        console.log(args.toString());
 
         while(anIterator.hasNext())
         {
@@ -648,38 +706,6 @@ export class Evaluator extends Object
         }
 
         return anObject;
-    }
-
-    /**
-     * 第２引数で指定されたリストの先頭の要素に第1引数で指定した値を設定し、応答するメソッド
-     * @param {Cons} args 引数
-     * @return {*} 評価結果
-     */
-    set_car_(args)
-    {
-        let anObject = Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
-        if(Cons.isNotCons(anObject)){ console.log('Can not apply \"set-car!\" to \"' + anObject + '\"'); return Cons.nil; }
-        let aCons = anObject;
-        anObject = Evaluator.eval(args.nth(2), this.environment, this.streamManager, this.depth);
-        aCons.setCar(anObject);
-
-        return Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
-    }
-
-    /**
-     * 第２引数で指定されたリストの先頭以外の要素に第1引数で指定した値を設定し、応答するメソッド
-     * @param {Cons} args 引数
-     * @return {*} 評価結果
-     */
-    set_cdr_(args)
-    {
-        let anObject = Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
-        if(Cons.isNotCons(anObject)){ console.log('Can not apply \"set-cdr!\" to \"' + anObject + '\"'); return Cons.nil; }
-        let aCons = anObject;
-        anObject = Evaluator.eval(args.nth(2), this.environment, this.streamManager, this.depth);
-        aCons.setCdr(anObject);
-
-        return Evaluator.eval(args.car, this.environment, this.streamManager, this.depth);
     }
 
     /**
@@ -702,10 +728,10 @@ export class Evaluator extends Object
         try
         {
             let aTable = new Map();
-            aTable.set(InterpretedSymbol.of("and"), "and"); //OK?
+            aTable.set(InterpretedSymbol.of("and"), "and");
 			aTable.set(InterpretedSymbol.of("apply"), "apply_lisp");
 			aTable.set(InterpretedSymbol.of("bind"), "bind");
-			aTable.set(InterpretedSymbol.of("cond"), "cond"); //OK?
+			aTable.set(InterpretedSymbol.of("cond"), "cond");
 			aTable.set(InterpretedSymbol.of("defun"), "defun");
 			aTable.set(InterpretedSymbol.of("do"), "do_");
 			aTable.set(InterpretedSymbol.of("dolist"), "doList");
@@ -717,23 +743,24 @@ export class Evaluator extends Object
             aTable.set(InterpretedSymbol.of("lambda"), "lambda");
 			aTable.set(InterpretedSymbol.of("let"), "let");
 			aTable.set(InterpretedSymbol.of("let*"), "letStar");
-			// aTable.set(InterpretedSymbol.of("nospy"), "nospy");
-			aTable.set(InterpretedSymbol.of("not"), "not"); //OK?
+			aTable.set(InterpretedSymbol.of("not"), "not");
 			aTable.set(InterpretedSymbol.of("notrace"), "notrace");
-			aTable.set(InterpretedSymbol.of("or"), "or"); //OK?
-			aTable.set(InterpretedSymbol.of("pop!"), "pop_");
-			aTable.set(InterpretedSymbol.of("progn"), "progn");
-			aTable.set(InterpretedSymbol.of("push!"), "push_");
-			aTable.set(InterpretedSymbol.of("quote"), "quote");
-			aTable.set(InterpretedSymbol.of("set!"), "set_");
-			aTable.set(InterpretedSymbol.of("set-all!"), "set_all_");
-			aTable.set(InterpretedSymbol.of("set-car!"), "set_car_");
-			aTable.set(InterpretedSymbol.of("set-cdr!"), "set_cdr_");
-			// aTable.set(InterpretedSymbol.of("spy"), "spy");
-			aTable.set(InterpretedSymbol.of("time"), "time");
+			aTable.set(InterpretedSymbol.of("or"), "or");
+			aTable.set(InterpretedSymbol.of("pop"), "pop_");
+            aTable.set(InterpretedSymbol.of("progn"), "progn");
+            aTable.set(InterpretedSymbol.of("print"), "print");
+            aTable.set(InterpretedSymbol.of("printc"), "printc");
+			aTable.set(InterpretedSymbol.of("push"), "push_");
+            aTable.set(InterpretedSymbol.of("quote"), "quote");
+            aTable.set(InterpretedSymbol.of("rplaca"), "rplaca");
+			aTable.set(InterpretedSymbol.of("rplacd"), "rplacd");
+			aTable.set(InterpretedSymbol.of("setq"), "setq");
+            aTable.set(InterpretedSymbol.of("set-allq"), "set_allq");
+            aTable.set(InterpretedSymbol.of("terpri"), "terpri");
+            aTable.set(InterpretedSymbol.of("time"), "time");
 			aTable.set(InterpretedSymbol.of("trace"), "trace");
-			aTable.set(InterpretedSymbol.of("unless"), "unless"); //OK?
-            aTable.set(InterpretedSymbol.of("when"), "when"); //OK?
+			aTable.set(InterpretedSymbol.of("unless"), "unless");
+            aTable.set(InterpretedSymbol.of("when"), "when");
             
             return aTable;
         }
@@ -780,6 +807,17 @@ export class Evaluator extends Object
         console.log(this.indent() + line);
         if(aStream != null){ /* Todo: 未実装 */ console.log(aPrintStream); }
         return null;
+    }
+
+    /**
+     * 改行を出力するメソッド
+     * @param {*} args 引数
+     * @return {InterpretedSymbol} インタプリテッドシンボルt
+     */
+    terpri(args = null)
+    {
+        console.log('');
+        return InterpretedSymbol.of('t');
     }
 
     /**

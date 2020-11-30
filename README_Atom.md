@@ -18,18 +18,14 @@ The interpreter recognizes when you write a symbol as follows.
 ```
 >> (set! a 10)
 10
-
 >> a
 10
-
 >> b
 I could find no variable binding for b
 nil
-
 >> abc
 I could find no variable binding for abc
 nil
-
 >> abc123
 I could find no variable binding for abc123
 nil
@@ -41,19 +37,14 @@ The interpreter recognizes when you write a number as follows.
 ```
 >> 123
 123
-
 >> -123
 -123
-
 >> 123.456
 123.456
-
 >> -123.456
 -123.456
-
 >> 123.456e7
 1234560000
-
 >> -123.456e-7
 -0.0000123456
 ```
@@ -65,7 +56,6 @@ The interpreter recognizes when you write a string as follows.
 ```
 >> "Kyoto"
 Kyoto
-
 >> "I have a pen."
 I have a pen.
 ```

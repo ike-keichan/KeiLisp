@@ -63,7 +63,7 @@ export class LispInterpreter extends Object
 
         this.rl.prompt(); // プロンプトの出力
         this.rl.on('line', (line) => { // コマンドラインの入力モードの処理と終了モードの処理
-            line += '\n'; // 行の最後に空白文字を加えておく。
+            line += ' '; // 行の最後に空白文字を加えておく。
 
             for(let aCharacter of line)
             {
@@ -75,8 +75,17 @@ export class LispInterpreter extends Object
            if(leftParentheses <= 0)
            {
                aCons = this.parse(aString);
-               // for(let each of aCons.loop()){ console.log(each.toString()); } //デバック用
-               for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }
+            //    try
+            //     {
+            //         // for(let each of aCons.loop()){ console.log(each.toString()); } //デバック用
+            //         for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }
+            //     }
+            //     catch (e) 
+            //     {
+            //         console.log('*** can not eval ' + aCons.toString() + ' ***')
+            //         console.log(Cons.nil.toString());
+            //     }
+                for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }
                leftParentheses = 0;
                aString = new String();
                this.rl.prompt(); // プロンプトの出力
@@ -99,7 +108,11 @@ export class LispInterpreter extends Object
     {
         let anObject = Cons.nil;
         // try { anObject = Evaluator.eval(aCons, this.root, this.streamManager); }
-        // catch (e) { anObject = Cons.nil; }
+        // catch (e) 
+        // {
+        //     console.log('*** can not eval ' + aCons.toString() + ' ***')
+        //     anObject = Cons.nil; 
+        // }
 
         anObject = Evaluator.eval(aCons, this.root, this.streamManager);
 
@@ -156,54 +169,62 @@ export class LispInterpreter extends Object
         aList.push('and');
         aList.push('apply');
         aList.push('assoc');
-        aList.push('atom?');
+        aList.push('atom');
         aList.push('bind');
         aList.push('car');
         aList.push('cdr');
-        aList.push('character?');
+        aList.push('characterp');
         aList.push('cond');
         aList.push('cons');
+        aList.push('consp');
         aList.push('copy');
+        aList.push('floatp');
         aList.push('defun');
         aList.push('divide');
         aList.push('do');
         aList.push('do*');
         aList.push('dolist');
-        aList.push('double?');
-        aList.push('eq?');
-        aList.push('equal?');
+        aList.push('doublep');
+        aList.push('eq');
+        aList.push('equal');
         aList.push('exit');
         aList.push('gc');
         aList.push('gensym');
         aList.push('if');
-        aList.push('integer?');
+        aList.push('integerp');
         aList.push('lambda');
         aList.push('let');
         aList.push('let*');
         aList.push('last');
         aList.push('list');
-        aList.push('list?');
+        aList.push('listp');
         aList.push('mapcar');
         aList.push('member');
+        aList.push('memq');
         aList.push('mod');
         aList.push('multiply');
+        aList.push('neq');
+        aList.push('nequal');
         aList.push('not');
         aList.push('notrace');
         aList.push('nth');
-        aList.push('null?');
-        aList.push('number?');
+        aList.push('null');
+        aList.push('numberp');
         aList.push('or');
-        aList.push('pop!');
+        aList.push('pop');
         aList.push('progn');
-        aList.push('push!');
+        aList.push('print');
+        aList.push('printc');
+        aList.push('push');
         aList.push('quote');
-        aList.push('set!');
-        aList.push('set-all!');
-        aList.push('set-car!');
-        aList.push('set-cdr!');
+        aList.push('rplaca');
+        aList.push('rplacd');
+        aList.push('setq');
+        aList.push('set-allq');
         aList.push('subtract');
-        aList.push('string?');
-        aList.push('symbol?');
+        aList.push('stringp');
+        aList.push('symbolp');
+        aList.push('terpri');
         aList.push('time');
         aList.push('trace');
         aList.push('unless');
@@ -212,8 +233,11 @@ export class LispInterpreter extends Object
         aList.push('-');
         aList.push('*');
         aList.push('/');
+        aList.push('//');
         aList.push('=');
         aList.push('==');
+        aList.push('~=');
+        aList.push('~~');
         aList.push('<');
         aList.push('<=');
         aList.push('>');
@@ -226,7 +250,7 @@ export class LispInterpreter extends Object
 
         let aString = new String();
         let aCons = new Cons();
-        aString = "(lambda (list1 list2) (cond ((atom? list1) nil) ((atom? list2) nil) ((null? list1) list2) (t (cons (car list1) (append (cdr list1) list2)))))";
+        aString = "(lambda (list1 list2) (cond ((atom list1) nil) ((atom list2) nil) ((null list1) list2) (t (cons (car list1) (append (cdr list1) list2)))))";
         aCons = Cons.parse(aString);
         aCons.last().setCdr(new Cons(aTable, Cons.nil));
         aTable.set(InterpretedSymbol.of('append'), aCons);
@@ -236,7 +260,7 @@ export class LispInterpreter extends Object
         aCons.last().setCdr(new Cons(aTable, Cons.nil));
 		aTable.set(InterpretedSymbol.of('butlast'), aCons);
 
-		aString = "(lambda (l) (cond ((atom? l) nil) ((null? l) 0)	(t (+ 1 (length (cdr l))))))";
+		aString = "(lambda (l) (cond ((atom l) nil) ((null l) 0)	(t (+ 1 (length (cdr l))))))";
         aCons = Cons.parse(aString);
         aCons.last().setCdr(new Cons(aTable, Cons.nil));
 		aTable.set(InterpretedSymbol.of('length'), aCons);
@@ -246,7 +270,7 @@ export class LispInterpreter extends Object
         aCons.last().setCdr(new Cons(aTable, Cons.nil));
 		aTable.set(InterpretedSymbol.of('nthcdr'), aCons);
 
-		aString = "(lambda (l) (cond ((atom? l) l) ((null? l) '()) (t (append (reverse (cdr l)) (list (car l))))))";
+		aString = "(lambda (l) (cond ((atom l) l) ((null l) '()) (t (append (reverse (cdr l)) (list (car l))))))";
         aCons = Cons.parse(aString);
         aCons.last().setCdr(new Cons(aTable, Cons.nil));
         aTable.set(InterpretedSymbol.of('reverse'), aCons);

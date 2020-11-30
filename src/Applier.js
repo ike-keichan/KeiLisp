@@ -275,6 +275,17 @@ export class Applier extends Object
     }
 
     /**
+     * 引数がConsかどうかを判別し、応答するメソッド。
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    cons_(args)
+    {
+        if(Cons.isCons(args.car)){ return InterpretedSymbol.of('t'); }
+        return Cons.nil;
+    }
+
+    /**
      * 引数のリストを複製し、応答するメソッド
      * @param {Cons} args 引数
      * @return {*} 評価結果
@@ -326,7 +337,7 @@ export class Applier extends Object
      */
     double_(args)
     {
-        if(Cons.isNumber(args.car) && !Number.isInteger(args.car)){ return InterpretedSymbol.of('t'); }
+        if(Cons.isNumber(args.car)){ return InterpretedSymbol.of('t'); }
         return Cons.nil;
     }
 
@@ -360,7 +371,7 @@ export class Applier extends Object
     {
         let first = args.car;
         let second = args.nth(2);
-        if(first === second){ return InterpretedSymbol.of('t'); }
+        if(first == second){ return InterpretedSymbol.of('t'); }
         
         return Cons.nil;
     }
@@ -374,7 +385,12 @@ export class Applier extends Object
     {
         let first = args.car;
         let second = args.nth(2);
-        if(first == second){ return InterpretedSymbol.of('t'); }
+        if(this.eq_(args) == InterpretedSymbol.of('t')){ return InterpretedSymbol.of('t'); }
+        if(Cons.isCons(first) && Cons.isCons(second))
+        {
+            if(first.equals(second)){ return InterpretedSymbol.of('t'); }
+            if(second.equals(first)){ return InterpretedSymbol.of('t'); }
+        }
         
         return Cons.nil;
     }
@@ -389,7 +405,8 @@ export class Applier extends Object
         if(!Cons.isString(args.car)){ console.log('Can not apply \"format\" to \"' + args.car + '\"'); }
         let aCons = args.cdr;
         let format = this.format_AUX(new String(args.car), aCons);
-        console.log(format);
+        process.stdout.write(String(format));
+        
         return Cons.nil;
     }
 
@@ -509,14 +526,27 @@ export class Applier extends Object
     }
 
     /**
-     * 指定されたインタプリテッドシンボルに適当な数字をつけたインタプリテッドシンボルを応答するメソッド
+     * 引数が浮動小数単精度数(Float)かどうかを判別し、応答するメソッド。
      * @param {Cons} args 引数
      * @return {*} 評価結果
      */
-    gensym(args)
+    float_(args)
     {
-        if(Cons.isNotSymbol(args.car)){ console.log('Can not apply \"gensym\" to \"' + args.car + '\"'); return Cons.nil; }
-        let aSymbol = InterpretedSymbol.of(args.car.toString() + Applier.generateNumber);
+        if(Cons.isNumber(args.car))
+        {
+            if(-3.4E+38 <= args.car && args.car <= 3.4E+38){ return InterpretedSymbol.of('t'); } 
+        }
+        return Cons.nil;
+    }
+
+    /**
+     * 新たなインタプリテッドシンボルを応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    gensym(args = null)
+    {
+        let aSymbol = InterpretedSymbol.of("id" + Applier.generateNumber);
         Applier.incrementGenerateNumber();
 
         return aSymbol;
@@ -758,7 +788,7 @@ export class Applier extends Object
      */
     list_(args)
     {
-        if(Cons.isCons(args.car)){ return InterpretedSymbol.of('t'); }
+        if(Cons.isList(args.car)){ return InterpretedSymbol.of('t'); }
         return Cons.nil;
     }
 
@@ -826,6 +856,17 @@ export class Applier extends Object
         }
 
         return Cons.nil;
+    }
+
+    /**
+     * 第2引数に第1引数の要素があるかどうかを判別し、応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    memq(args)
+    {
+        if(this.member(args) == Cons.nil){ return Cons.nil; }
+        else{ return InterpretedSymbol.of('t'); }
     }
 
     /**
@@ -899,13 +940,35 @@ export class Applier extends Object
     }
 
     /**
+     * eqの否定を応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    neq(args)
+    {
+        if(this.eq_(args) == InterpretedSymbol.of('t')){ return Cons.nil; }
+        else{ return InterpretedSymbol.of('t') }
+    }
+
+    /**
+     * equalの否定を応答するメソッド
+     * @param {Cons} args 引数
+     * @return {*} 評価結果
+     */
+    nequal(args)
+    {
+        if(this.equal_(args) == InterpretedSymbol.of('t')){ return Cons.nil; }
+        else{ return InterpretedSymbol.of('t') }
+    }
+
+    /**
      * 第2引数の第1引数番目の要素を応答するメソッド
      * @param {Cons} args 引数
      * @return {*} 評価結果
      */
     nth(args)
     {
-        if(Number.isInteger(args.car)){ return Cons.nil; }
+        if(!Number.isInteger(args.car)){ return Cons.nil; }
         let index = args.car;
         let aCons = args.nth(2);
 
@@ -969,45 +1032,53 @@ export class Applier extends Object
         try
         {
             let aTable = new Map();
-            aTable.set(InterpretedSymbol.of("abs"), "abs"); //OK?
-			aTable.set(InterpretedSymbol.of("add"), "add"); //OK?
-			aTable.set(InterpretedSymbol.of("assoc"), "assoc"); //OK?
-			aTable.set(InterpretedSymbol.of("atom?"), "atom_"); //OK?
-			aTable.set(InterpretedSymbol.of("car"), "car"); //OK?
-			aTable.set(InterpretedSymbol.of("cdr"), "cdr"); //OK?
-			aTable.set(InterpretedSymbol.of("character?"), "character_"); //OK?
-			aTable.set(InterpretedSymbol.of("cons"), "cons"); //OK?
-			aTable.set(InterpretedSymbol.of("copy"), "copy"); //OK?
-			aTable.set(InterpretedSymbol.of("divide"), "divide"); //OK?
-			aTable.set(InterpretedSymbol.of("double?"), "double_"); //OK?
-			aTable.set(InterpretedSymbol.of("eq?"), "eq_"); //OK?
-			aTable.set(InterpretedSymbol.of("equal?"), "equal_"); //OK?
+            aTable.set(InterpretedSymbol.of("abs"), "abs");
+			aTable.set(InterpretedSymbol.of("add"), "add");
+			aTable.set(InterpretedSymbol.of("assoc"), "assoc");
+			aTable.set(InterpretedSymbol.of("atom"), "atom_");
+			aTable.set(InterpretedSymbol.of("car"), "car");
+			aTable.set(InterpretedSymbol.of("cdr"), "cdr");
+			aTable.set(InterpretedSymbol.of("characterp"), "character_");
+            aTable.set(InterpretedSymbol.of("cons"), "cons");
+            aTable.set(InterpretedSymbol.of("consp"), "cons_");
+            aTable.set(InterpretedSymbol.of("copy"), "copy");
+            aTable.set(InterpretedSymbol.of("floatp"), "float_");
+			aTable.set(InterpretedSymbol.of("divide"), "divide");
+			aTable.set(InterpretedSymbol.of("doublep"), "double_");
+			aTable.set(InterpretedSymbol.of("eq"), "eq_");
+			aTable.set(InterpretedSymbol.of("equal"), "equal_");
 			aTable.set(InterpretedSymbol.of("format"), "format");
-			aTable.set(InterpretedSymbol.of("gensym"), "gensym"); //OK?
-			aTable.set(InterpretedSymbol.of("integer?"), "integer_"); //OK?
-			aTable.set(InterpretedSymbol.of("last"), "last"); //OK?
-			aTable.set(InterpretedSymbol.of("list"), "list"); //OK?
-			aTable.set(InterpretedSymbol.of("list?"), "list_"); //OK?
-			aTable.set(InterpretedSymbol.of("mapcar"), "mapcar"); //OK?
-			aTable.set(InterpretedSymbol.of("member"), "member"); //OK?
-			aTable.set(InterpretedSymbol.of("mod"), "mod"); //OK?
-			aTable.set(InterpretedSymbol.of("multiply"), "multiply"); //OK?
-			aTable.set(InterpretedSymbol.of("nth"), "nth"); //OK?
-			aTable.set(InterpretedSymbol.of("null?"), "null_"); //OK?
-			aTable.set(InterpretedSymbol.of("number?"), "number_"); //OK?
-			aTable.set(InterpretedSymbol.of("subtract"), "subtract"); //OK?
-			aTable.set(InterpretedSymbol.of("string?"), "string_"); //OK?
-			aTable.set(InterpretedSymbol.of("symbol?"), "symbol_"); //OK?
-			aTable.set(InterpretedSymbol.of("+"), "add"); //OK?
-			aTable.set(InterpretedSymbol.of("-"), "subtract"); //OK?
-			aTable.set(InterpretedSymbol.of("*"), "multiply"); //OK?
-            aTable.set(InterpretedSymbol.of("/"), "divide"); //OK?
-            aTable.set(InterpretedSymbol.of("="), "eq_"); //OK?
-            aTable.set(InterpretedSymbol.of("=="), "equal_"); //OK?
-			aTable.set(InterpretedSymbol.of("<"), "lessThan"); //OK?
-			aTable.set(InterpretedSymbol.of("<="), "lessThanOrEqual"); //OK?
-			aTable.set(InterpretedSymbol.of(">"), "greaterThan"); //OK?
-			aTable.set(InterpretedSymbol.of(">="), "greaterThanOrEqual"); //OK?
+			aTable.set(InterpretedSymbol.of("gensym"), "gensym");
+			aTable.set(InterpretedSymbol.of("integerp"), "integer_");
+			aTable.set(InterpretedSymbol.of("last"), "last");
+			aTable.set(InterpretedSymbol.of("list"), "list");
+			aTable.set(InterpretedSymbol.of("listp"), "list_");
+			aTable.set(InterpretedSymbol.of("mapcar"), "mapcar");
+            aTable.set(InterpretedSymbol.of("member"), "member");
+            aTable.set(InterpretedSymbol.of("memq"), "memq");
+			aTable.set(InterpretedSymbol.of("mod"), "mod");
+            aTable.set(InterpretedSymbol.of("multiply"), "multiply");
+            aTable.set(InterpretedSymbol.of("neq"), "neq");
+            aTable.set(InterpretedSymbol.of("nequal"), "nequal");
+			aTable.set(InterpretedSymbol.of("nth"), "nth");
+			aTable.set(InterpretedSymbol.of("null"), "null_");
+			aTable.set(InterpretedSymbol.of("numberp"), "number_");
+			aTable.set(InterpretedSymbol.of("subtract"), "subtract");
+			aTable.set(InterpretedSymbol.of("stringp"), "string_");
+			aTable.set(InterpretedSymbol.of("symbolp"), "symbol_");
+			aTable.set(InterpretedSymbol.of("+"), "add");
+			aTable.set(InterpretedSymbol.of("-"), "subtract");
+			aTable.set(InterpretedSymbol.of("*"), "multiply");
+            aTable.set(InterpretedSymbol.of("/"), "divide");
+            aTable.set(InterpretedSymbol.of("//"), "mod");
+            aTable.set(InterpretedSymbol.of("=="), "eq_");
+            aTable.set(InterpretedSymbol.of("="), "equal_");
+            aTable.set(InterpretedSymbol.of("~~"), "neq");
+            aTable.set(InterpretedSymbol.of("~="), "nequal");
+			aTable.set(InterpretedSymbol.of("<"), "lessThan");
+			aTable.set(InterpretedSymbol.of("<="), "lessThanOrEqual");
+			aTable.set(InterpretedSymbol.of(">"), "greaterThan");
+			aTable.set(InterpretedSymbol.of(">="), "greaterThanOrEqual");
             
             return aTable;
         }
