@@ -29,6 +29,7 @@ In this interpreter the following functions are defined.
 + [eq](#eq)
 + [equal](#equal)
 + [exit](#exit)
++ [floatp](#floatp)
 + [gc](#gc)
 + [gensym](#gensym)
 + [if](#if)
@@ -41,8 +42,11 @@ In this interpreter the following functions are defined.
 + [listp](#listp)
 + [mapcar](#mapcar)
 + [member](#member)
++ [memq](#memq)
 + [mod](#mod)
 + [multipy](#multiply)
++ [neq](#neq)
++ [nequal](#nequal)
 + [not](#not)
 + [notrace](#notrace)
 + [nth](#nth)
@@ -70,12 +74,15 @@ In this interpreter the following functions are defined.
 + [-](#-)
 + [*](#-1)
 + [/](#-2)
-+ [=](#-3)
-+ [==](#-4)
-+ [<](#-5)
-+ [<=](#-6)
-+ [>](#-7)
-+ [>=](#-8)
++ [//](#-3)
++ [=](#-4)
++ [==](#-5)
++ [~=](#-6)
++ [~~](#-7)
++ [<](#-8)
++ [<=](#-9)
++ [>](#-10)
++ [>=](#-11)
 
 ### abs
 **(abs X)**
@@ -356,12 +363,20 @@ Function to answer whether X is a Double.
 
 ```
 >> (doublep 12)
-nil
+t
 >> (doublep 12.3)
 t
 >> (doublep -12)
-nil
+t
 >> (doublep -12.3)
+t
+>> (doublep 3.4E-38)
+t
+>> (doublep 3.4E+38)
+t
+>> (doublep 1.7E+308)
+t
+>> (doublep 1.7E-308)
 t
 >> (doublep '(1 2 3))
 nil
@@ -373,6 +388,15 @@ nil
 nil
 >> (doublep "abc")
 nil
+```
+
+### eval
+**(eval X)**
+Function to answer the result of applying X to L.
+
+```
+>> (eval (+ 1 2))
+3
 ```
 
 ### eq
@@ -414,7 +438,7 @@ t
 >> (equal 1 "1")
 t
 >> (equal '(a b) '(a b))
-nil
+t
 ```
 
 ### exit
@@ -424,6 +448,39 @@ Function to exit the Lisp interpreter.
 ```
 >> (exit)
 Bye!
+```
+
+### floatep
+**(doublep X)**
+Function to answer whether X is a Float.
+
+```
+>> (floatp 12)
+t
+>> (floatp 12.3)
+t
+>> (floatp -12)
+t
+>> (floatp -12.3)
+t
+>> (floatp 3.4E-38)
+t
+>> (floatp 3.4E+38)
+t
+>> (floatp 1.7E-308)
+nil
+>> (floatp 1.7E+308)
+nil
+>> (floatp '(1 2 3))
+nil
+>> (floatp '())
+nil
+>> (floatp 'a)
+nil
+>> (floatp "a")
+nil
+>> (floatp "abc")
+nil
 ```
 
 ### gc
@@ -474,6 +531,14 @@ nil
 t
 >> (integerp -12.3)
 nil
+>> (integerp 3.4E-38)
+nil
+>> (integerp 3.4E+38)
+t
+>> (integerp 1.7E-308)
+nil
+>> (integerp 1.7E+308)
+t
 >> (integerp '(1 2 3))
 nil
 >> (integerp '())
@@ -607,6 +672,19 @@ nil
 nil
 ```
 
+### memq
+**(memq X L)**
+Functions to answer whether or not X is an element of list L.
+
+```
+>> (memq 'b '(a b c))
+t
+>> (memq 'd '(a b c))
+nil
+>> (memq '2 '(1 (2 (3 4) (5) (6 7) 8) 9))
+nil
+```
+
 ### mod
 **(mod X1 X2 ... Xn)**
 Function to answer the excess of X1 divide by X2 ... and Xn.
@@ -627,6 +705,48 @@ Function to answer the product of X1 and X2 ... and Xn.
 6
 >> (multiply 20 30 40)
 24000
+```
+
+### neq
+**(neq X Y)**
+Function that answers whether X and Y are not equal or not.
+
+```
+>> (neq 'a 'a)
+nil
+>> (neq 'a 'b)
+t
+>> (neq 1 1)
+nil
+>> (neq 1 2)
+t
+>> (neq 1 1.0)
+nil
+>> (neq 1 "1")
+nil
+>> (neq '(a b) '(a b))
+t
+```
+
+### nequal
+**(nequal X Y)**
+Function that answers whether X and Y are not equal or not.
+
+```
+>> (nequal 'a 'a)
+nil
+>> (nequal 'a 'b)
+t
+>> (nequal 1 1)
+nil
+>> (nequal 1 2)
+t
+>> (nequal 1 1.0)
+nil
+>> (nequal 1 "1")
+nil
+>> (nequal '(a b c) '(a b c))
+nil
 ```
 
 ### not
@@ -845,25 +965,25 @@ Functions to bind the value of Y to X to the entire environment.
 20
 ```
 
-### set-carq
-**(set-carq X L)**
+### rplaca
+**(rplaca X L)**
 Function to bind X to the head of list L.
 
 ```
 >> (setq a '(1 2 3))
 (1 2 3)
->> (set-carq a 4)
+>> (rplaca a 4)
 (4 2 3)
 ```
 
-### set-cdrq
-**(set-cdrq X L)**
+### rplacd
+**(rplacd X L)**
 Function to bind X to the tail of list L.
 
 ```
 >> (setq a '(1 2 3))
 (1 2 3)
->> (set-cdrq a 4)
+>> (rplacd a 4)
 (1 . 4)
 ```
 
@@ -1029,6 +1149,18 @@ Same as the function "[divide](#divide)".
 0.6
 ```
 
+### //
+**(// X1 X2 ... Xn)**
+Function to answer the excess of X1 divide by X2 ... and Xn.<br>
+Same as the function "[mod](#mod)".
+
+```
+>> (// 1000 3)
+1
+>> (// 100 43 8)   
+6
+```
+
 ### =
 **(= X Y)**
 Function that answers whether X and Y are equal or not.<br>
@@ -1048,7 +1180,7 @@ t
 >> (= 1 "1")
 nil
 >> (= '(a b) '(a b))
-nil
+t
 ```
 
 ### ==
@@ -1070,6 +1202,50 @@ t
 >> (== 1 "1")
 t
 >> (== '(a b) '(a b))
+nil
+```
+
+### ~=
+**(= X Y)**
+Function that answers whether X and Y are not equal or not.<br>
+Same as the function "[nequal](#nequal)".
+
+```
+>> (~= 'a 'a)
+nil
+>> (~= 'a 'b)
+t
+>> (~= 1 1)
+nil
+>> (~= 1 2)
+t
+>> (~= 1 1.0)
+nil
+>> (~= 1 "1")
+nil
+>> (~= '(a b) '(a b))
+nil
+```
+
+### ~~
+**(~~ X Y)**
+Function that answers whether X and Y are not equal or not.<br>
+Same as the function "[neq](#neq)".
+
+```
+>> (~~ 'a 'a)
+nil
+>> (~~ 'a 'b)
+t
+>> (~~ 1 1)
+nil
+>> (~~ 1 2)
+t
+>> (~~ 1 1.0)
+nil
+>> (~~ 1 "1")
+nil
+>> (~~ '(a b) '(a b))
 nil
 ```
 
