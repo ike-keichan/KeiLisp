@@ -28,6 +28,7 @@ In this interpreter the following functions are defined.
 + [doublep](#doublep)
 + [eq](#eq)
 + [equal](#equal)
++ [eval](#eval)
 + [exit](#exit)
 + [floatp](#floatp)
 + [gc](#gc)
@@ -56,6 +57,8 @@ In this interpreter the following functions are defined.
 + [or](#or)
 + [pop](#pop)
 + [progn](#progn)
++ [print](#print)
++ [printc](#printc)
 + [push](#push)
 + [quote](#quote)
 + [reverse](#reverse)
@@ -66,6 +69,7 @@ In this interpreter the following functions are defined.
 + [subtract](#subtract)
 + [stringp](#stringp)
 + [symbolp](#symbolp)
++ [terpri](#terpri)
 + [time](#time)
 + [trace](#trace)
 + [unless](#unless)
@@ -328,7 +332,7 @@ Function to answer the quotient of X1 divided by X2 ... and Xn.
 List L is a list of temporary variables, functions to do X in parallel.
 
 ```
->> (do* ((ans 0)(a 0 (+ a 1)))
+>> (do ((ans 0)(a 0 (+ a 1)))
         ((= a 10) ans)
         (setq ans (+ ans a)))
 45
@@ -350,7 +354,7 @@ Functions to do X in order for the elements of the list L
 
 ```
 >> (dolist (each '(a b c) t)
-        (format "~a" each))
+        (format "~a~%" each))
 a
 b
 c
@@ -483,6 +487,12 @@ nil
 nil
 ```
 
+### format
+**(format L X1 X2 ... Xn)**
+
+```
+```
+
 ### gc
 **(gc)**
 Functions to operate the garbage collection.
@@ -597,7 +607,7 @@ Explicitly create a new environment. List L is a list of temporary variables, fu
 10
 >> (let ((a 20)
         (b a))
-        (format "~a~%~a" a b))
+        (format "~a~%~a~%" a b))
 20
 10
 nil
@@ -612,7 +622,7 @@ Explicitly create a new environment. List L is a list of temporary variables, fu
 10
 >> (let* ((a 20)
         (b a))
-        (format "~a~%~a" a b))
+        (format "~a~%~a~%" a b))
 20
 20
 nil
@@ -886,12 +896,31 @@ Function to run X1, X2 ... and Xn in sequence.
 
 ```
 >> (progn ((a 10))
-        (format "~a" a)
+        (format "~a~%" a)
         (setq a (+ a 10))
-        (format "~a" a))
+        (format "~a~%" a))
 10
 20
 nil
+```
+
+### print
+**(print X)**
+Function to output X with a newline.
+
+```
+>> (print (+ 1 2))
+3
+3
+```
+
+### printc
+**(printc X)**
+Function to output X without a newline.
+
+```
+>> (printc (+ 1 2))
+33
 ```
 
 ### push
@@ -1034,6 +1063,16 @@ nil
 nil
 >> (symbolp "abc")
 nil
+```
+
+### terpri
+**(terpri)**
+Function to output new line;
+
+```
+>> (terpri)
+
+t
 ```
 
 ### time
