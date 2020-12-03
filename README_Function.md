@@ -1,5 +1,5 @@
 # JSLisp
-（this document fix： 2020/11/29 create: 2020/11/27）
+（this document fix： 2020/12/1 create: 2020/11/27）
 
 ## Function
 In this interpreter the following functions are defined.
@@ -107,6 +107,7 @@ Function to answer the sum of X1, X2 ... and Xn.
 >> (add 12 -34 5.6 -7.8 90)
 65.8
 ```
+
 ### and
 **(and X1 X2 ... Xn)**
 Function to answer the logical product of X1, X2 ... and Xn.
@@ -440,7 +441,7 @@ nil
 >> (equal 1 1.0)
 t
 >> (equal 1 "1")
-t
+nil
 >> (equal '(a b) '(a b))
 t
 ```
@@ -1251,7 +1252,7 @@ nil
 >> (== 1 1.0)
 t
 >> (== 1 "1")
-t
+nil
 >> (== '(a b) '(a b))
 nil
 ```
@@ -1273,7 +1274,7 @@ t
 >> (~= 1 1.0)
 nil
 >> (~= 1 "1")
-nil
+t
 >> (~= '(a b) '(a b))
 nil
 ```
@@ -1295,9 +1296,9 @@ t
 >> (~~ 1 1.0)
 nil
 >> (~~ 1 "1")
-nil
+t
 >> (~~ '(a b) '(a b))
-nil
+t
 ```
 
 ### <

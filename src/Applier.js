@@ -371,7 +371,7 @@ export class Applier extends Object
     {
         let first = args.car;
         let second = args.nth(2);
-        if(first == second){ return InterpretedSymbol.of('t'); }
+        if(first === second){ return InterpretedSymbol.of('t'); }
         
         return Cons.nil;
     }

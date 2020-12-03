@@ -72,24 +72,24 @@ export class LispInterpreter extends Object
                 aString += aCharacter;
             }
 
-           if(leftParentheses <= 0)
-           {
-               aCons = this.parse(aString);
-            //    try
-            //     {
-            //         // for(let each of aCons.loop()){ console.log(each.toString()); } //デバック用
-            //         for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }
-            //     }
-            //     catch (e) 
-            //     {
-            //         console.log('*** can not eval ' + aCons.toString() + ' ***')
-            //         console.log(Cons.nil.toString());
-            //     }
-                for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }
-               leftParentheses = 0;
-               aString = new String();
-               this.rl.prompt(); // プロンプトの出力
-           }
+            if(leftParentheses <= 0)
+            {
+                aCons = this.parse(aString);
+                try
+                    {
+                        // for(let each of aCons.loop()){ console.log(each.toString()); } //デバック用
+                        for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }
+                    }
+                    catch (e) 
+                    {
+                        console.log('*** can not eval ' + aCons.toString() + ' ***')
+                        console.log(Cons.nil.toString());
+                    }
+                    // for(let each of aCons.loop()){ console.log(this.eval(each).toString()); }  //デバック用
+                leftParentheses = 0;
+                aString = new String();
+                this.rl.prompt(); // プロンプトの出力
+            }
 
         }).on('close', () => {
             console.log('\nBye!');
@@ -107,14 +107,14 @@ export class LispInterpreter extends Object
     eval(aCons)
     {
         let anObject = Cons.nil;
-        // try { anObject = Evaluator.eval(aCons, this.root, this.streamManager); }
-        // catch (e) 
-        // {
-        //     console.log('*** can not eval ' + aCons.toString() + ' ***')
-        //     anObject = Cons.nil; 
-        // }
+        try { anObject = Evaluator.eval(aCons, this.root, this.streamManager); }
+        catch (e) 
+        {
+            console.log('*** can not eval ' + aCons.toString() + ' ***')
+            anObject = Cons.nil; 
+        }
 
-        anObject = Evaluator.eval(aCons, this.root, this.streamManager);
+        // anObject = Evaluator.eval(aCons, this.root, this.streamManager); //デバック用
 
         return anObject;
     }

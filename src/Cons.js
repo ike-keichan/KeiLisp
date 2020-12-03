@@ -95,7 +95,7 @@ export class Cons extends Object
      */
     equalsAUX(left, right)
     {
-        if(left == right){ return true; }
+        if(left === right){ return true; }
         if((Cons.isCons(left) && Cons.isCons(right)) == false){ return false; }
         let leftCons = left;
         let rightCons = right;

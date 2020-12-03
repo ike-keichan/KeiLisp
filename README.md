@@ -1,9 +1,9 @@
 # JSLisp
-（this document fix： 2020/11/27 create: 2020/11/5）
+（this document fix： 2020/12/1 create: 2020/11/5）
 
 ## Status
 Creation Period：2020.7~
-Version： -
+Version： 1.0 (2020/12/1)
 
 ## About program
 I am developing it as a graduation research project of "Special Research on Computer Science and Engineering IIA/IIB" in Department of Computer Science and Engineering, Kyoto Sangyo University. 

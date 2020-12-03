@@ -572,6 +572,20 @@ export class Evaluator extends Object
     }
 
     /**
+     * 引数を改行なしで出力する関数
+     * @param {Cons} aCons 評価するCons
+     * @return {*} 評価結果
+     */
+    princ(aCons)
+    {
+        let anObject = Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
+        process.stdout.write(String(anObject));
+
+        return anObject;
+
+    }
+
+    /**
      * 引数を改行ありで出力する関数
      * @param {Cons} aCons 評価するCons
      * @return {*} 評価結果
@@ -580,20 +594,6 @@ export class Evaluator extends Object
     {
         let anObject = Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
         console.log(anObject);
-
-        return anObject;
-
-    }
-
-    /**
-     * 引数を改行なしで出力する関数
-     * @param {Cons} aCons 評価するCons
-     * @return {*} 評価結果
-     */
-    printc(aCons)
-    {
-        let anObject = Evaluator.eval(aCons.car, this.environment, this.streamManager, this.depth);
-        process.stdout.write(String(anObject));
 
         return anObject;
 
@@ -748,8 +748,8 @@ export class Evaluator extends Object
 			aTable.set(InterpretedSymbol.of("or"), "or");
 			aTable.set(InterpretedSymbol.of("pop"), "pop_");
             aTable.set(InterpretedSymbol.of("progn"), "progn");
+            aTable.set(InterpretedSymbol.of("princ"), "princ");
             aTable.set(InterpretedSymbol.of("print"), "print");
-            aTable.set(InterpretedSymbol.of("printc"), "printc");
 			aTable.set(InterpretedSymbol.of("push"), "push_");
             aTable.set(InterpretedSymbol.of("quote"), "quote");
             aTable.set(InterpretedSymbol.of("rplaca"), "rplaca");
