@@ -5,7 +5,7 @@ then
     echo '-----Prepare package.json  -----'
     cat << EOF > ./package.json
 {
-    "name": "JSLisp",
+    "name": "KeiLisp",
     "version": "1.0.0",
     "description": "このプログラムはJSでLisp処理系を作成したものです。",
     "main": "Example.js",

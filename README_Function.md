@@ -1,5 +1,5 @@
-# JSLisp
-（this document fix： 2020/12/1 create: 2020/11/27）
+# KeiLisp
+（this document fix： 2020/12/4 create: 2020/11/27）
 
 ## Function
 In this interpreter the following functions are defined.

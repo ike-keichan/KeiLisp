@@ -1,14 +1,18 @@
-# JSLisp
-（this document fix： 2020/12/1 create: 2020/11/5）
+# KeiLisp
+（this document fix： 2020/12/4 create: 2020/11/5）
 
 ## Status
 Creation Period：2020.7~
 Version： 1.0 (2020/12/1)
 
 ## About program
-I am developing it as a graduation research project of "Special Research on Computer Science and Engineering IIA/IIB" in Department of Computer Science and Engineering, Kyoto Sangyo University. 
+Hello! I am developing it as a graduation research project of "Special Research on Computer Science and Engineering IIA/IIB" in Department of Computer Science and Engineering, Kyoto Sangyo University. 
 
-It is under development as of November 27, 2020.
+This is an interpreter that mimics Lisp.
+I hope this will be the beginning of your encounter with Lisp and functional programming.
+This program is intended to run in the CLI, but I will later allow you to run this program in a web browser.
+
+As of December 1, 2020, version 1 is complete.
 ## Execution environment
 ### OS
 ```
@@ -34,7 +38,7 @@ If the OS and Node.js versions match, the following software will be installed a
 ### Node module
 ```
 $ npm list --depth=0
-JSLisp@1.0.0 ~/JSLisp
+KeiLisp@1.0.0 ~/KeiLisp
 ├── @babel/core@7.12.9
 ├── @babel/plugin-proposal-class-properties@7.12.1
 ├── @babel/preset-env@7.12.7
@@ -50,12 +54,12 @@ JSLisp@1.0.0 ~/JSLisp
 ## Quick start
 ### Install
 ```
-$ git clone https://github.com/ike-keichan/JSLisp.git
+$ git clone https://github.com/ike-keichan/KeiLisp.git
 ```
 
 ### Build & Launch
 ```
-$ cd ./JSLisp
+$ cd ./KeiLisp
 $ make test
 ```
 
