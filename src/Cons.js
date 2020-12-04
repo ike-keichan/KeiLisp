@@ -404,11 +404,8 @@ export class Cons extends Object
         else
         {
             aString += anObject.toString();
-            // console.log('いいい: ' + anObject.toString());
         }
-        // aString = aString == NaN ? 'nil' : aString;
-
-        // console.log('ああああ: ' + aString);
+        
         return aString;
     }
 }

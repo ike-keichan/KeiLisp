@@ -449,7 +449,8 @@ t
 
 ### exit
 **(exit)**
-Function to exit the Lisp interpreter.
+Function to exit the Lisp interpreter.<br>
+This function is KeiLisp only. This is no support with KeiLisp-onWeb.
 
 ```
 >> (exit)
@@ -491,7 +492,7 @@ nil
 
 ### format
 **(format L X1 X2 ... Xn)**
-Function to format the output contents.
+Function to format the output contents.<br>
 Write the content to be formatted output after "~".
 "%" represents a line break. Any other single character represents a value bound to a symbol.
 Symbol-bound values can be specified by filling in as the argument X after L.
@@ -509,7 +510,8 @@ nil
 
 ### gc
 **(gc)**
-Functions to operate the garbage collection.
+Functions to operate the garbage collection.<br>
+This function is KeiLisp only. This is no support with KeiLisp-onWeb.
 
 ```
 >> (gc)

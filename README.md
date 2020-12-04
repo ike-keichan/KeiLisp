@@ -52,25 +52,25 @@ KeiLisp@1.0.0 ~/KeiLisp
 
 ```
 
+## Reference
++ [Atom](./README_Atom.md)
++ [Cons](./README_Cons.md)
++ [Function](./README_Function.md)
+
 ## Quick start
 ### Install
 ```
 $ git clone https://github.com/ike-keichan/KeiLisp.git
 ```
 
-### Build & Launch
+### Setup & Launch
 ```
 $ cd ./KeiLisp
 $ make test
 ```
 
-### Syntax
-+ [Atom](./README_Atom.md)
-+ [Cons](./README_Cons.md)
-+ [Function](./README_Function.md)
-
-### Example
-#### example1
+## Example
+### example1
 ```
 >> 1
 1
@@ -82,7 +82,7 @@ a
 nil
 ```
 
-#### example2
+### example2
 ```
 >> ()
 nil
@@ -96,22 +96,9 @@ nil
 4.6
 >> (+ 1.2 -3.4)
 -2.2
->> (+ 1 nil)
-Can not apply "add" to "nil"
-nil
->> (+ nil 1)
-Can not apply "add" to "nil"
-nil
->> (+ 1.2 nil)
-Can not apply "add" to "nil"
-nil
->> (+ nil 1.2)
-Can not apply "add" to "nil"
-nil
-
 ```
 
-#### example3
+### example3
 ```
 >> '(1 . 2)
 (1 . 2)
@@ -131,7 +118,7 @@ nil
 (nil 1.2)
 ```
 
-#### example4
+### example4
 ```
 >> (car '(1 (2 (3 (4 5) 6) 7 (8 9))))
 1
@@ -162,6 +149,7 @@ tasu
 ```
 
 ---
+## Others
 
 ### Clean
 ```
