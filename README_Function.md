@@ -918,6 +918,15 @@ Function to run X1, X2 ... and Xn in sequence.
 nil
 ```
 
+### princ
+**(princ X)**
+Function to output X without a newline.
+
+```
+>> (princ (+ 1 2))
+33
+```
+
 ### print
 **(print X)**
 Function to output X with a newline.
@@ -926,15 +935,6 @@ Function to output X with a newline.
 >> (print (+ 1 2))
 3
 3
-```
-
-### printc
-**(printc X)**
-Function to output X without a newline.
-
-```
->> (printc (+ 1 2))
-33
 ```
 
 ### push
