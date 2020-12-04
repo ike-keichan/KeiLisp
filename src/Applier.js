@@ -557,7 +557,7 @@ export class Applier extends Object
         if(this.streamManager == null){ return process.out; }
         if(anObject instanceof String || (typeof anObject) == "string"){ return process.out; }
 
-        return this.streamManager.getStream(anObject);
+        return this.streamManager.getStream();
     }
 
     /**

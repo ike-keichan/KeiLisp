@@ -511,7 +511,6 @@ export class Evaluator extends Object
         return Cons.nil;
     }
 
-    // Todo:実装不十分
     /**
      * トレースしないように設定するメソッド
      * @param {*} args 引数
@@ -835,18 +834,14 @@ export class Evaluator extends Object
 
     }
 
-    // Todo:実装不十分
     /**
      * トレースするように設定するメソッド
      * @param {Cons} aCons トレースするCons
      * @return {InterpretedSymbol} インタプリテッドシンボルt
      */
-    trace(aCons)
+    trace(aCons = null)
     {
-        let anObject = aCons.car;
-        if(Cons.isNil(anObject) || anObject == null){ anObject = 'default'; }
-        this.streamManager.trace(new String(anObject));
-        
+        this.streamManager.trace();   
         return InterpretedSymbol.of('t');
     }
 
