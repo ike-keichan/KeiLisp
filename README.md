@@ -2,7 +2,7 @@
 （this document fix： 2020/12/4 create: 2020/11/5）
 
 ## Status
-Creation Period：2020.7~
+Creation Period：2020.7~<br>
 Version： 1.0 (2020/12/1)
 
 ## About program
