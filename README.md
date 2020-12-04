@@ -35,7 +35,7 @@ $ node --version
 v12.18.3
 ```
 
-If the OS and Node.js versions match, the following software will be installed automatically when you build your environment.
+If the OS and Node.js versions match, the following software will be installed automatically when you setup your environment.
 ### Node module
 ```
 $ npm list --depth=0
@@ -58,7 +58,7 @@ KeiLisp@1.0.0 ~/KeiLisp
 $ git clone https://github.com/ike-keichan/KeiLisp.git
 ```
 
-### Build & Launch
+### Setup & Launch
 ```
 $ cd ./KeiLisp
 $ make test
