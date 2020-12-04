@@ -2,7 +2,7 @@
 （this document fix： 2020/12/4 create: 2020/11/5）
 
 ## Status
-Creation Period：2020.7~
+Creation Period：2020.7~<br>
 Version： 1.0 (2020/12/1)
 
 ## About program
@@ -11,7 +11,7 @@ Hello! I am developing it as a graduation research project of "Special Research 
 This is an interpreter that mimics Lisp.
 I hope this will be the beginning of your encounter with Lisp and functional programming.
 This program is intended to be run in the CLI.
-A program that can be run in a web browser is [here](https://github.com/ike-keichan/KeiLisp).
+A program that can be run in a web browser is [here](https://github.com/ike-keichan/KeiLisp-onWeb).
 
 As of December 1, 2020, version 1.0 is complete.
 ## Execution environment
@@ -35,7 +35,7 @@ $ node --version
 v12.18.3
 ```
 
-If the OS and Node.js versions match, the following software will be installed automatically when you build your environment.
+If the OS and Node.js versions match, the following software will be installed automatically when you setup your environment.
 ### Node module
 ```
 $ npm list --depth=0
