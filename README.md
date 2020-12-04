@@ -13,7 +13,7 @@ I hope this will be the beginning of your encounter with Lisp and functional pro
 This program is intended to be run in the CLI.
 A program that can be run in a web browser is [here](https://github.com/ike-keichan/KeiLisp).
 
-As of December 1, 2020, version 1 is complete.
+As of December 1, 2020, version 1.0 is complete.
 ## Execution environment
 ### OS
 ```
