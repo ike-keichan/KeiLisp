@@ -111,7 +111,7 @@ export class Cons extends Object
      */
     static isAtom(anObject)
     {
-        return !(Cons.isList(anObject));
+        return !(Cons.isCons(anObject));
     }
 
     /**

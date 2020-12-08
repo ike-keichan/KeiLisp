@@ -1,5 +1,5 @@
 # KeiLisp
-（this document fix： 2020/11/27 create: 2020/11/27）
+（this document fix： 2020/12/09 create: 2020/12/04）
 
 ## Atom
 In this interpreter, the following are called atoms.
@@ -7,6 +7,7 @@ In this interpreter, the following are called atoms.
 + [Symbol](#symbol)
 + [Number](#number)
 + [String](#string)
++ [Nil](#nil)
 
 ### Symbol
 You must start with an alphabetic character.
@@ -58,4 +59,16 @@ The interpreter recognizes when you write a string as follows.
 Kyoto
 >> "I have a pen."
 I have a pen.
+```
+
+### Nil
+In other languages it may be called "Null".
+The interpreter recognizes when you write a Nil as follows.
+
+```
+>> nil
+nil
+
+>> ()
+nil
 ```

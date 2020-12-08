@@ -1,15 +1,16 @@
 # KeiLisp
-（this document fix： 2020/11/27 create: 2020/11/27）
+（this document fix： 2020/12/04 create: 2020/12/04）
 
-## Atom
+## Cons
 In this interpreter, the following are called Cons.
 
-+ [Pairs](#pairs)
-+ [Nil](#nil)
++ [Pairs](#Pairs)
++ [List](#List)
 
 ### Pairs
-Pairs are separated by "(", ". )" and a space or other separator.
-The interpreter recognizes when you write a Pairs as follows.
+Common Cons notation.　The front part of the "." is called "car" and the back part is called "cdr".
+Pairs are separated by "(", ".", ")" and a space or other separator.
+The interpreter recognizes when you write as follows.
 
 ```
 >> '(1 . 2)
@@ -28,13 +29,13 @@ The interpreter recognizes when you write a Pairs as follows.
 (nil . 1)
 ```
 
-### Nil
-In other languages it may be called "Null".
-The interpreter recognizes when you write a Nil as follows.
+### List
+List is also part of Cons. For example, if you write a List like "(1 2 3)", the interpreter will internally call "(1 . (2 . (3 . nil)))".<br>
+An exceptionally empty-list is a list, but not a Cons! An empty list is written as "()", but recognizes "nil".
 
 ```
->> nil
-nil
+>> '(1 2 3)
+(1 2 3)
 
 >> ()
 nil

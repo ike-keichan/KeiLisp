@@ -167,7 +167,7 @@ Function to answer whether X is an Atom.
 >> (atom '(1 2 3))
 nil
 >> (atom '())
-nil
+t
 >> (atom 'a)
 t
 >> (atom 1)
@@ -175,6 +175,8 @@ t
 >> (atom "a")
 t
 >> (atom "abc")
+t
+>> (atom nil)
 t
 ```
 
