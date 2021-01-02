@@ -56,7 +56,7 @@ export class InterpretedSymbol extends Object
     /**
      * 同じ印字名に対して同一のインタプリテッドシンボルを応答するメソッド
      * @param {String} aString 印字名
-     * @return aSymbol 引数と同一のインタプリテッドシンボル
+     * @return {InterpretedSymbol} 引数と同一のインタプリテッドシンボル
      */
     static of(aString)
     {

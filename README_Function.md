@@ -20,6 +20,7 @@ In this interpreter the following functions are defined.
 + [cons](#cons)
 + [consp](#consp)
 + [copy](#copy)
++ [cos](#cos)
 + [defun](#defun)
 + [divide](#divide)
 + [do](#do)
@@ -30,6 +31,7 @@ In this interpreter the following functions are defined.
 + [equal](#equal)
 + [eval](#eval)
 + [exit](#exit)
++ [exp](#exp)
 + [floatp](#floatp)
 + [format](#format)
 + [gc](#gc)
@@ -47,6 +49,7 @@ In this interpreter the following functions are defined.
 + [memq](#memq)
 + [mod](#mod)
 + [multipy](#multiply)
++ [napier](#napier)
 + [neq](#neq)
 + [nequal](#nequal)
 + [not](#not)
@@ -56,20 +59,26 @@ In this interpreter the following functions are defined.
 + [null](#null)
 + [numberp](#numberp)
 + [or](#or)
++ [pi](#pi)
 + [pop](#pop)
 + [progn](#progn)
 + [princ](#princ)
 + [print](#print)
 + [push](#push)
 + [quote](#quote)
++ [random](#random)
 + [reverse](#reverse)
++ [round](#round)
 + [rplaca](#rplaca)
 + [rplacd](#rplacd)
 + [setq](#setq)
 + [set-allq](#set-allq)
++ [sin](#sin)
++ [sqrt](#sqrt)
 + [subtract](#subtract)
 + [stringp](#stringp)
 + [symbolp](#symbolp)
++ [tasn](#tan)
 + [terpri](#terpri)
 + [time](#time)
 + [trace](#trace)
@@ -309,6 +318,20 @@ nil
 
 ```
 
+### cos
+***(cos X)***
+Function to answer an cos of X.
+Due to the limited accuracy of PI, there will be a slight error.
+
+```
+>> (cos 0)
+1
+>> (cos (/ (pi) 2))
+6.123233995736766e-17
+>> (cos (pi))
+-1
+```
+
 ### defun
 **(defun N L X1 X2 ... Xn)**
 Function defining function with N as the function name, L as the argument, and X1, X2 ... and Xn as the process.
@@ -508,6 +531,17 @@ Symbol-bound values can be specified by filling in as the argument X after L.
 >> (format "~a~%" a)
 10
 nil
+```
+
+### exp
+***(exp X)***
+Function to answer the X power of e.
+
+```
+>> (exp 1)
+2.718281828459045
+>> (exp 2)
+7.38905609893065
 ```
 
 ### gc
@@ -735,6 +769,16 @@ Function to answer the product of X1 and X2 ... and Xn.
 24000
 ```
 
+### napier
+***(napier)***
+Function to answer the Napier number
+
+```
+>> (napier)
+2.718281828459045
+```
+
+
 ### neq
 **(neq X Y)**
 Function that answers whether X and Y are not equal or not.
@@ -891,6 +935,16 @@ t
 nil
 ```
 
+### pi
+***(pi)***
+Function to answer Pi.
+
+```
+>> (pi)
+3.141592653589793
+```
+
+
 ### pop
 **(pop L)**
 Function to pop to Symbol-bound list L.
@@ -967,6 +1021,21 @@ a
 1
 ```
 
+### random
+***(random)***
+Function to answer a random number greater than or equal to 0 and less than or equal to 1.
+
+```
+>> (random)
+0.009480010828665675
+>> (random)
+0.8373835786363886
+>> (random)
+0.11100420744539452
+>> (random)
+0.9867023484200941
+```
+
 ### reverse
 **(reverse L)**
 Function to answer the list of list L inverse order.
@@ -976,6 +1045,21 @@ Function to answer the list of list L inverse order.
 (c b a)
 >> (reverse '(1 (2 (3 4) (5) (6 7) 8) 9))
 (9 (2 (3 4) (5) (6 7) 8) 1)
+```
+
+### round
+***(round X)***
+Function to answer the rounded value of X.
+
+```
+>> (round 1.1)
+1
+>> (round 1.9)
+2
+>> (round 1.49)
+1
+>> (round 1.50)
+2
 ```
 
 ### rplaca
@@ -1025,13 +1109,44 @@ hello
 Functions to bind the value of Y to X to the entire environment.
 
 ```
->> (setq a 10)
+>> (set-allq a 10)
 10
 >> (let ((a 20))
         (set-allq a a))
 20
 >> a
 20
+```
+
+### sin
+***(sin X)***
+Function to answer a sin of X.
+Due to the limited accuracy of PI, there will be a slight error.
+
+```
+>> (sin 0)
+0
+>> (sin (/ (pi) 2))
+1
+>> (sin (pi))
+1.2246467991473532e-16
+```
+
+### sqrt
+***(sqrt X)***
+Function to answer the square root of X.
+
+```
+>> (sqrt 1)
+1
+>> (sqrt 2)
+1.4142135623730951
+>> (sqrt 3)
+1.7320508075688772
+>> (sqrt 4)
+2
+>> (sqrt 9)
+3
 ```
 
 ### subtract
@@ -1081,6 +1196,18 @@ nil
 nil
 >> (symbolp "abc")
 nil
+```
+
+### tan
+***(tan X)***
+Function to answer a tan of X.
+Due to the limited accuracy of PI, there will be a slight error.
+
+```
+>> (tan 0)
+0
+>> (tan (/ (pi) 4))
+0.9999999999999999
 ```
 
 ### terpri

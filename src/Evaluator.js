@@ -216,11 +216,10 @@ export class Evaluator extends Object
         this.bindingParallel(parameters, this.environment);
         if(Cons.isNil(bool)){ bool.setCar(Cons.nil); }
 
-        while(true)
+        while(Cons.isNil(Evaluator.eval(bool.car, this.environment, this.streamManager, this.depth)))
         {
             let theTable = new Map();
             let value;
-            if(Cons.isNotNil(Evaluator.eval(bool.car, this.environment, this.streamManager, this.depth))){ break; }
             for(let each of expressions.loop()){ Evaluator.eval(each, this.environment, this.streamManager, this.depth); }
             for(let each of parameters.loop())
             {
@@ -270,9 +269,8 @@ export class Evaluator extends Object
         this.binding(parameters, this.environment);
         if(Cons.isNil(bool)){ bool.setCar(Cons.nil); }
 
-        while(true)
+        while(Cons.isNil(Evaluator.eval(bool.car, this.environment, this.streamManager, this.depth)))
         {
-            if(Cons.isNotNil(Evaluator.eval(bool.car, this.environment, this.streamManager, this.depth))){ break; }
             for(let each of expressions.loop()){ Evaluator.eval(each, this.environment, this.streamManager, this.depth); }
             for(let each of parameters.loop())
             {
@@ -342,7 +340,7 @@ export class Evaluator extends Object
     eval(form)
     {
         if(Cons.isSymbol(form)){ return this.evaluateSymbol(form); }
-        if(Cons.isNil(form) || Cons.isAtom(form)){ return form; }
+        if(Cons.isNil(form) || Cons.isNotList(form)){ return form; }
         if(Cons.isSymbol(form.car) &&  Evaluator.buildInFunctions.has(form.car)){ return this.specialForm(form); }
 
         return this.entrustApplier(form);
@@ -390,9 +388,8 @@ export class Evaluator extends Object
 
     /**
      * 処理系を終了するメソッド
-     * @param {*} args 引数
      */
-    exit(args = null)
+    exit()
     {
         console.log('Bye!');
         process.exit(0);
@@ -400,10 +397,9 @@ export class Evaluator extends Object
 
     /**
      * ガベージコレクタを実行するメソッド
-     * @param {*} args 引数
      * @return {InterpretedSymbol} インタプリテッドシンボルt
      */
-    gc(args = null)
+    gc()
     {
         const gc = require('expose-gc/function');
         gc();
@@ -513,10 +509,9 @@ export class Evaluator extends Object
 
     /**
      * トレースしないように設定するメソッド
-     * @param {*} args 引数
      * @return {InterpretedSymbol} インタプリテッドシンボルt
      */
-    notrace(args = null)
+    notrace()
     {
         this.streamManager.noTrace();
 		return InterpretedSymbol.of("t");
@@ -785,7 +780,11 @@ export class Evaluator extends Object
         let aCons = form.cdr;
         let methodName = Evaluator.buildInFunctions.get(aSymbol);
 
-        try { let method = this[methodName]; }
+        try 
+        {
+            let method = this[methodName];
+            ((x) => {x})(method); // 何もしない。
+        }
         catch(e){ throw new Error('Not Found Method: ' + methodName); }
 
         let answer = R.invoker(1, methodName)(aCons, this);
@@ -810,10 +809,9 @@ export class Evaluator extends Object
 
     /**
      * 改行を出力するメソッド
-     * @param {*} args 引数
      * @return {InterpretedSymbol} インタプリテッドシンボルt
      */
-    terpri(args = null)
+    terpri()
     {
         console.log('');
         return InterpretedSymbol.of('t');
@@ -836,10 +834,9 @@ export class Evaluator extends Object
 
     /**
      * トレースするように設定するメソッド
-     * @param {Cons} aCons トレースするCons
      * @return {InterpretedSymbol} インタプリテッドシンボルt
      */
-    trace(aCons = null)
+    trace()
     {
         this.streamManager.trace();   
         return InterpretedSymbol.of('t');

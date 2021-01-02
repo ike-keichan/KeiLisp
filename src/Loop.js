@@ -49,7 +49,7 @@ export class Loop extends Object
 
     /**
      * 次の要素を応答するメソッド
-     * @return {Object} 自身
+     * @return {Object} 次の要素
      */
     next() 
     {

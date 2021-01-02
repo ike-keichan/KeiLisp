@@ -8,7 +8,7 @@
  * @author Keisuke Ikeda
  * @this {IntStream}
  */
-export class IntStream
+export class IntStream extends Object
 {
     /**
      * startからafterEnd(含めない)までの連番の配列を作り、応答するメソッド

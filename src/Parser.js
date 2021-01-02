@@ -154,7 +154,7 @@ export class Parser extends Object
     /**
      * 引数の文字列をパースし、応答するメソッド
      * @param {String} aString
-     * @return {*}  
+     * @return {Cons}  
      */
     static parse(aString)
     {

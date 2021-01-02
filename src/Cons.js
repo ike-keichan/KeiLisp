@@ -111,7 +111,7 @@ export class Cons extends Object
      */
     static isAtom(anObject)
     {
-        return !(Cons.isCons(anObject));
+        return Cons.isNotCons(anObject);
     }
 
     /**
@@ -152,6 +152,16 @@ export class Cons extends Object
     static isNotCons(anObject)
     {
         return !(Cons.isCons(anObject));
+    }
+
+    /**
+     * 引数がListでないかどうかを判別し、応答するメソッド
+     * @param {*} anObject 判別するオブジェクト
+     * @return {Boolean} 真偽値
+     */
+    static isNotList(anObject)
+    {
+        return !(Cons.isList(anObject));
     }
 
     /**
@@ -294,7 +304,7 @@ export class Cons extends Object
     /**
      * 指定された文字列を字句解析してConsを生成し、応答するメソッド
      * @param {String} aString 字句解析する文字列
-     * @return {}
+     * @return {Cons}
      */
     static parse(aString)
     {
@@ -359,7 +369,8 @@ export class Cons extends Object
             else
             {
                 let aCons = this.cdr;
-                while(true)
+                let flag = true;
+                while(flag)
                 {
                     let head = aCons.car;
                     let tail = aCons.cdr;

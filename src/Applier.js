@@ -14,9 +14,6 @@ import { Evaluator } from './Evaluator.js';
 //モジュール「InterpretedSymbol」を読み込む。
 import { InterpretedSymbol } from './InterpretedSymbol';
 
-// モジュール「StreamManager」を読み込む。
-import { StreamManager } from './StreamManager.js';
-
 // モジュール「Table」を読み込む。
 import { Table } from './Table.js';
 
@@ -191,7 +188,7 @@ export class Applier extends Object
             theCons = theCons.cdr;
         }
 
-        if(Cons.isAtom(aCons.cdr) && (Cons.isNotNil(aCons.cdr)))
+        if(Cons.isNotList(aCons.cdr) && (Cons.isNotNil(aCons.cdr)))
         {
             try { this.environment.set(aCons.cdr, theCons.cdr); }
             catch(e) { console.log('sizes do not match.'); return null; }
@@ -219,7 +216,11 @@ export class Applier extends Object
 
         methodName = Applier.buildInFunctions.get(procedure);
 
-        try { let method = this[methodName]; }
+        try 
+        {
+            let method = this[methodName];
+            ((x) => {x})(method); // 何もしない。
+        }
         catch(e){ console.log('Not Found Method: ' + methodName); }
 
         answer = R.invoker(1, methodName)(args, this); 
@@ -267,7 +268,7 @@ export class Applier extends Object
     /**
      * 第一引数と第二引数のリストを結合し、応答するメソッド
      * @param {Cons} args 引数
-     * @return {*} 評価結果
+     * @return {Cons} 評価結果
      */
     cons(args)
     {
@@ -293,6 +294,19 @@ export class Applier extends Object
     copy(args)
     {
         return Cons.cloneValue(args.car);
+    }
+
+    /**
+     * 引数のコサインを応答するメソッド
+     * @param {Cons} args 引数
+     * @return {Number} 計算結果
+     */
+    cos(args)
+    {
+        if(Cons.isNumber(args.car)){ return Math.cos(args.car); }
+        else { selectPrintFunction()('Can not apply "cos" to "' + args.car + '"'); }
+
+        return Cons.nil;
     }
 
     /**
@@ -392,6 +406,19 @@ export class Applier extends Object
             if(second.equals(first)){ return InterpretedSymbol.of('t'); }
         }
         
+        return Cons.nil;
+    }
+
+    /**
+     * 引数をxとするe^xの値応答するメソッド
+     * @param {Cons} args 引数
+     * @return {Number} 計算結果
+     */
+    exp(args)
+    {
+        if(Cons.isNumber(args.car)){ return Math.exp(args.car); }
+        else { selectPrintFunction()('Can not apply "exp" to "' + args.car + '"'); }
+
         return Cons.nil;
     }
 
@@ -541,10 +568,9 @@ export class Applier extends Object
 
     /**
      * 新たなインタプリテッドシンボルを応答するメソッド
-     * @param {Cons} args 引数
-     * @return {*} 評価結果
+     * @return {InterpretedSymbol} 評価結果
      */
-    gensym(args = null)
+    gensym()
     {
         let aSymbol = InterpretedSymbol.of("id" + Applier.generateNumber);
         Applier.incrementGenerateNumber();
@@ -772,7 +798,7 @@ export class Applier extends Object
 
     /**
 	 * 引数の値をリストにまとめて応答する.
-	 * @param args
+	 * @param {Object} args 引数
 	 * @return {*} 評価結果
 	 */
     list(args)
@@ -940,6 +966,15 @@ export class Applier extends Object
     }
 
     /**
+     * ネイピア数を応答するメソッド
+     * @return {Number} 計算結果
+     */
+    napier()
+    {
+        return Math.E;
+    }
+
+    /**
      * eqの否定を応答するメソッド
      * @param {Cons} args 引数
      * @return {*} 評価結果
@@ -998,6 +1033,39 @@ export class Applier extends Object
     }
 
     /**
+     * 円周率を応答するメソッド
+     * @param {Cons} args 引数
+     * @return {Number} 計算結果
+     */
+    pi()
+    {
+        return Math.PI;
+    }
+
+    /**
+     * 乱数を応答するメソッド
+     * @param {Cons} args 引数
+     * @return {Number} 計算結果
+     */
+    random()
+    {
+        return Math.random();
+    }
+
+    /**
+     * 引数の四捨五入した値を応答するメソッド
+     * @param {Cons} args 引数
+     * @return {Number} 計算結果
+     */
+    round(args)
+    {
+        if(Cons.isNumber(args.car)){ return Math.round(args.car); }
+        else { selectPrintFunction()('Can not apply "round" to "' + args.car + '"'); }
+
+        return Cons.nil;
+    }
+
+    /**
      * 実行する処理を選択し、実行するメソッド
      * @param {InterpretedSymbol} procedure 関数名、又はオペレータ
      * @param {Cons} args 引数
@@ -1042,11 +1110,13 @@ export class Applier extends Object
             aTable.set(InterpretedSymbol.of("cons"), "cons");
             aTable.set(InterpretedSymbol.of("consp"), "cons_");
             aTable.set(InterpretedSymbol.of("copy"), "copy");
+            aTable.set(InterpretedSymbol.of("cos"), "cos");
             aTable.set(InterpretedSymbol.of("floatp"), "float_");
 			aTable.set(InterpretedSymbol.of("divide"), "divide");
 			aTable.set(InterpretedSymbol.of("doublep"), "double_");
 			aTable.set(InterpretedSymbol.of("eq"), "eq_");
-			aTable.set(InterpretedSymbol.of("equal"), "equal_");
+            aTable.set(InterpretedSymbol.of("equal"), "equal_");
+            aTable.set(InterpretedSymbol.of("exp"), "exp");
 			aTable.set(InterpretedSymbol.of("format"), "format");
 			aTable.set(InterpretedSymbol.of("gensym"), "gensym");
 			aTable.set(InterpretedSymbol.of("integerp"), "integer_");
@@ -1058,14 +1128,21 @@ export class Applier extends Object
             aTable.set(InterpretedSymbol.of("memq"), "memq");
 			aTable.set(InterpretedSymbol.of("mod"), "mod");
             aTable.set(InterpretedSymbol.of("multiply"), "multiply");
+            aTable.set(InterpretedSymbol.of("napier"), "napier");
             aTable.set(InterpretedSymbol.of("neq"), "neq");
             aTable.set(InterpretedSymbol.of("nequal"), "nequal");
 			aTable.set(InterpretedSymbol.of("nth"), "nth");
 			aTable.set(InterpretedSymbol.of("null"), "null_");
-			aTable.set(InterpretedSymbol.of("numberp"), "number_");
+            aTable.set(InterpretedSymbol.of("numberp"), "number_");
+            aTable.set(InterpretedSymbol.of("pi"), "pi");
+            aTable.set(InterpretedSymbol.of("random"), "random");
+            aTable.set(InterpretedSymbol.of("round"), "round");
+            aTable.set(InterpretedSymbol.of("sin"), "sin");
+            aTable.set(InterpretedSymbol.of("sqrt"), "sqrt");
 			aTable.set(InterpretedSymbol.of("subtract"), "subtract");
 			aTable.set(InterpretedSymbol.of("stringp"), "string_");
-			aTable.set(InterpretedSymbol.of("symbolp"), "symbol_");
+            aTable.set(InterpretedSymbol.of("symbolp"), "symbol_");
+            aTable.set(InterpretedSymbol.of("tan"), "tan");
 			aTable.set(InterpretedSymbol.of("+"), "add");
 			aTable.set(InterpretedSymbol.of("-"), "subtract");
 			aTable.set(InterpretedSymbol.of("*"), "multiply");
@@ -1085,6 +1162,19 @@ export class Applier extends Object
         catch(e){ throw new Error('NullPointerException (Applier, initialize)'); }
     }
 
+    /**
+     * 引数のサインを応答するメソッド
+     * @param {Cons} args 引数
+     * @return {Number} 計算結果
+     */
+    sin(args)
+    {
+        if(Cons.isNumber(args.car)){ return Math.sin(args.car); }
+        else { selectPrintFunction()('Can not apply "sin" to "' + args.car + '"'); }
+
+        return Cons.nil;
+    }
+
     spyPrint(aStream, line)
     {
         let aPrintStream = process.stdout;
@@ -1092,6 +1182,19 @@ export class Applier extends Object
         console.log(this.indent() + line);
         if(aStream != null){ console.log(aPrintStream); }
         return null;
+    }
+
+    /**
+     * 引数の平方根を応答するメソッド
+     * @param {Cons} args 引数
+     * @return {Number} 計算結果
+     */
+    sqrt(args)
+    {
+        if(Cons.isNumber(args.car)){ return Math.sqrt(args.car); }
+        else { selectPrintFunction()('Can not apply "sqrt" to "' + args.car + '"'); }
+
+        return Cons.nil;
     }
 
     /**
@@ -1148,6 +1251,19 @@ export class Applier extends Object
     symbol_(args)
     {
         if (Cons.isSymbol(args.car)) { return InterpretedSymbol.of('t'); }
+        return Cons.nil;
+    }
+
+    /**
+     * 引数のタンジェントを応答するメソッド
+     * @param {Cons} args 引数
+     * @return {Number} 計算結果
+     */
+    tan(args)
+    {
+        if(Cons.isNumber(args.car)){ return Math.tan(args.car); }
+        else { selectPrintFunction()('Can not apply "tan" to "' + args.car + '"'); }
+
         return Cons.nil;
     }
 
