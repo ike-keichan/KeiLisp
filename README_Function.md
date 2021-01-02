@@ -267,7 +267,6 @@ Function to answer Yn1, Yn2 ... and Ynn satisfy the Xn condition.
         ((= 1 3) 20)
      	((= 1 1) 30))
 30
-
 ```
 
 ### cons
@@ -315,11 +314,10 @@ t
 (a b)
 >> (eq a (copy a))
 nil
-
 ```
 
 ### cos
-***(cos X)***
+**(cos X)**
 Function to answer an cos of X.
 Due to the limited accuracy of PI, there will be a slight error.
 
@@ -482,6 +480,17 @@ This function is KeiLisp only. This is no support with KeiLisp-onWeb.
 Bye!
 ```
 
+### exp
+**(exp X)**
+Function to answer the X power of e.
+
+```
+>> (exp 1)
+2.718281828459045
+>> (exp 2)
+7.38905609893065
+```
+
 ### floatp
 **(floatp X)**
 Function to answer whether X is a Float.
@@ -531,17 +540,6 @@ Symbol-bound values can be specified by filling in as the argument X after L.
 >> (format "~a~%" a)
 10
 nil
-```
-
-### exp
-***(exp X)***
-Function to answer the X power of e.
-
-```
->> (exp 1)
-2.718281828459045
->> (exp 2)
-7.38905609893065
 ```
 
 ### gc
@@ -770,14 +768,13 @@ Function to answer the product of X1 and X2 ... and Xn.
 ```
 
 ### napier
-***(napier)***
+**(napier)**
 Function to answer the Napier number
 
 ```
 >> (napier)
 2.718281828459045
 ```
-
 
 ### neq
 **(neq X Y)**
@@ -936,14 +933,13 @@ nil
 ```
 
 ### pi
-***(pi)***
+**(pi)**
 Function to answer Pi.
 
 ```
 >> (pi)
 3.141592653589793
 ```
-
 
 ### pop
 **(pop L)**
@@ -1022,7 +1018,7 @@ a
 ```
 
 ### random
-***(random)***
+**(random)**
 Function to answer a random number greater than or equal to 0 and less than or equal to 1.
 
 ```
@@ -1048,7 +1044,7 @@ Function to answer the list of list L inverse order.
 ```
 
 ### round
-***(round X)***
+**(round X)**
 Function to answer the rounded value of X.
 
 ```
@@ -1109,7 +1105,7 @@ hello
 Functions to bind the value of Y to X to the entire environment.
 
 ```
->> (set-allq a 10)
+>> (setq a 10)
 10
 >> (let ((a 20))
         (set-allq a a))
@@ -1119,7 +1115,7 @@ Functions to bind the value of Y to X to the entire environment.
 ```
 
 ### sin
-***(sin X)***
+**(sin X)**
 Function to answer a sin of X.
 Due to the limited accuracy of PI, there will be a slight error.
 
@@ -1133,7 +1129,7 @@ Due to the limited accuracy of PI, there will be a slight error.
 ```
 
 ### sqrt
-***(sqrt X)***
+**(sqrt X)**
 Function to answer the square root of X.
 
 ```
@@ -1199,7 +1195,7 @@ nil
 ```
 
 ### tan
-***(tan X)***
+**(tan X)**
 Function to answer a tan of X.
 Due to the limited accuracy of PI, there will be a slight error.
 
